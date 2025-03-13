@@ -88,4 +88,13 @@
 
     </androidx.cardview.widget.CardView>
 
+    <TextView
+        android:id="@+id/txtthongbao"
+        android:layout_width="match_parent"
+        android:layout_height="78dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="#B71C1C"
+        android:textSize="20sp" />
+
 </LinearLayout>
