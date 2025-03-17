@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class Login extends AppCompatActivity {
 
     private EditText editEmail;
     private EditText editPassword;
@@ -79,12 +79,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateToRegister() {
-        Intent intent = new Intent(MainActivity.this, Register.class);
+        Intent intent = new Intent(Login.this, Register.class);
         startActivity(intent);
     }
 
     private void navigateToHome() {
-        Intent intent = new Intent(MainActivity.this, Home.class);
+        Intent intent = new Intent(Login.this, Home.class);
         startActivity(intent);
         finish();
     }

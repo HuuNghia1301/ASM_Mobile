@@ -9,7 +9,7 @@
     android:fontFamily="casual"
     android:orientation="vertical"
     android:scrollbarSize="6dp"
-    tools:context=".MainActivity">
+    tools:context=".Login">
 
     <ImageView
         android:id="@+id/imageView"
