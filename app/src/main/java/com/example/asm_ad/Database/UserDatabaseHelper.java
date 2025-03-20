@@ -57,23 +57,13 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public long addUser(String firstName, String lastName, String phone, String email, Date dob, String password, String role) {
+    public long addUser(String firstName, String lastName, String email, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_FIRST_NAME, firstName);
         values.put(COLUMN_LAST_NAME, lastName);
-        values.put(COLUMN_PHONE, phone);
         values.put(COLUMN_EMAIL, email);
-
-        values.put(COLUMN_DOB, dob.getTime());
-
         values.put(COLUMN_PASSWORD, password);
-        values.put(COLUMN_ROLE, role);
-
-        // Get current date and time for created_at
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String currentDateTime = dateFormat.format(new Date());
-        values.put(COLUMN_CREATED_AT, currentDateTime);
 
         long id = -1;
         try {

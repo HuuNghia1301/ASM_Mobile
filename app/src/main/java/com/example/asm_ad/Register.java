@@ -24,7 +24,6 @@ public class Register extends AppCompatActivity {
     private EditText editFirstName;
     private EditText editLastName;
     private EditText editPhone;
-    private Button btnSign;
     private TextView txtthongbao;
 
     @Override
@@ -40,7 +39,7 @@ public class Register extends AppCompatActivity {
         editFirstName =findViewById(R.id.editFirstName);
         editLastName = findViewById(R.id.editLastName);
         editPhone = findViewById(R.id.editPhone);
-        btnSign = findViewById(R.id.btnSign);
+        Button btnSign = findViewById(R.id.btnSign);
         txtthongbao = findViewById(R.id.txtthongbao);
         btnSign.setOnClickListener(v -> userRegiter());
 
