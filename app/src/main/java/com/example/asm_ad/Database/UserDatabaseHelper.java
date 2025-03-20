@@ -9,11 +9,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class UserDatabaseHelper extends SQLiteOpenHelper {
 
@@ -25,12 +22,8 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_FIRST_NAME = "first_name";
     public static final String COLUMN_LAST_NAME = "last_name";
-    public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_EMAIL = "email";
-    public static final String COLUMN_DOB = "dob"; // Store as DATE
     public static final String COLUMN_PASSWORD = "password";
-    public static final String COLUMN_ROLE = "role";
-    public static final String COLUMN_CREATED_AT = "created_at"; // Store as DATETIME
 
     public UserDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,48 +31,33 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_FIRST_NAME + " TEXT,"
-                + COLUMN_LAST_NAME + " TEXT,"
-                + COLUMN_PHONE + " TEXT,"
-                + COLUMN_EMAIL + " TEXT,"
-                + COLUMN_DOB + " DATE," // DATE type
-                + COLUMN_PASSWORD + " TEXT,"
-                + COLUMN_ROLE + " TEXT,"
-                + COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP" + ")"; // DATETIME type
+        String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + " ("
+                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_FIRST_NAME + " TEXT, "
+                + COLUMN_LAST_NAME + " TEXT, "
+                + COLUMN_EMAIL + " TEXT, "
+                + COLUMN_PASSWORD + " TEXT)";
         sqLiteDatabase.execSQL(CREATE_USERS_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         onCreate(sqLiteDatabase);
     }
 
-    public long addUser(String firstName, String lastName, String phone, String email, Date dob, String password, String role) {
+    public long addUser(String firstName, String lastName, String email, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_FIRST_NAME, firstName);
         values.put(COLUMN_LAST_NAME, lastName);
-        values.put(COLUMN_PHONE, phone);
         values.put(COLUMN_EMAIL, email);
-
-        values.put(COLUMN_DOB, dob.getTime());
-
         values.put(COLUMN_PASSWORD, password);
-        values.put(COLUMN_ROLE, role);
-
-        // Get current date and time for created_at
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String currentDateTime = dateFormat.format(new Date());
-        values.put(COLUMN_CREATED_AT, currentDateTime);
 
         long id = -1;
         try {
             id = db.insertOrThrow(TABLE_USERS, null, values);
         } catch (Exception e) {
-
             Log.e("UserDatabaseHelper", "Error adding user", e);
         } finally {
             db.close();
@@ -87,19 +65,58 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
 
         return id;
     }
-    // get all users from database
-    public List<String[]> getUser(){
+
+    // Get all users from database
+    public boolean checkUser(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_USERS;
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        List<String[]> userList = new ArrayList<>();
+        String[] columns = {COLUMN_ID};
+        String selection = COLUMN_EMAIL + " = ? AND " + COLUMN_PASSWORD + " = ?";
+        String[] selectionArgs = {email, password};
+
+        Cursor cursor = db.query(
+                TABLE_USERS,
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        boolean userExists = cursor.getCount() > 0;
+
+        cursor.close();
+        db.close();
+
+        return userExists;
+    }
+    public boolean isEmailExists(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+
+        return exists;
+    }
+    String fullName;
+    public String getUserFullname(String email) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + COLUMN_FIRST_NAME + ", " + COLUMN_LAST_NAME + " FROM " +
+                TABLE_USERS + " WHERE " + COLUMN_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
         if (cursor.moveToFirst()) {
-            do {
-                userList.add(new String[]{cursor.getString(1), cursor.getString(2)});
-            }while (cursor.moveToNext());
+            String firstName = cursor.getString(0);
+            String lastName = cursor.getString(1);
+            fullName = firstName + " " + lastName;
         }
         cursor.close();
         db.close();
-        return userList;
+        return fullName;
     }
+
+
 }

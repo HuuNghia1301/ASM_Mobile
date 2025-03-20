@@ -1,6 +1,7 @@
 package com.example.asm_ad.Database;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -75,5 +76,20 @@ public class ExpenseDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = super.getReadableDatabase();
         db.execSQL("PRAGMA foreign_keys=ON");
         return db;
+    }
+    public int getUserIdByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int userId = -1; // Giá trị mặc định nếu không tìm thấy user
+
+        String query = "SELECT " + USER_COLUMN_ID + " FROM " + TABLE_USERS + " WHERE email = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+
+        if (cursor.moveToFirst()) {
+            userId = cursor.getInt(0);
+        }
+
+        cursor.close();
+        db.close();
+        return userId; // Trả về ID của user, hoặc -1 nếu không tìm thấy
     }
 }
