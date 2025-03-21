@@ -44,4 +44,5 @@ public class HomeFrafment extends Fragment {
 
         user.setText("Xin chào : " + fullName);
     }
+
 }
