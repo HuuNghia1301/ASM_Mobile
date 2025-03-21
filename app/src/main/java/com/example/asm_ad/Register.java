@@ -8,23 +8,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.asm_ad.Database.UserDatabaseHelper;
+
 
 public class Register extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
-    private EditText editEmail;
-    private EditText editPassword;
-    private EditText editFirstName;
-    private EditText editLastName;
-    private EditText editPhone;
+    private EditText editEmail, editPassword, editFirstName, editLastName;
+    private Button btnSign;
     private TextView txtthongbao;
+    private UserDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,48 +26,53 @@ public class Register extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
 
-        mAuth = FirebaseAuth.getInstance();
+        dbHelper = new UserDatabaseHelper(this);
 
         editEmail = findViewById(R.id.editEmail);
         editPassword = findViewById(R.id.editPassword);
-        editFirstName =findViewById(R.id.editFirstName);
+        editFirstName = findViewById(R.id.editFirstName);
         editLastName = findViewById(R.id.editLastName);
-        editPhone = findViewById(R.id.editPhone);
-        Button btnSign = findViewById(R.id.btnSign);
+        btnSign = findViewById(R.id.btnSign);
         txtthongbao = findViewById(R.id.txtthongbao);
-        btnSign.setOnClickListener(v -> userRegiter());
 
+        btnSign.setOnClickListener(v -> userRegister());
     }
-    private void userRegiter(){
 
+    private void userRegister() {
         String mail = editEmail.getText().toString().trim();
         String password = editPassword.getText().toString().trim();
-        String fistName = editFirstName.getText().toString().trim();
+        String firstName = editFirstName.getText().toString().trim();
         String lastName = editLastName.getText().toString().trim();
-        String phone = editPhone.getText().toString().trim();
 
-        if (mail.isEmpty() || password.isEmpty()|| fistName.isEmpty()|| lastName.isEmpty()|| phone.isEmpty()) {
+        if (mail.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
             txtthongbao.setText("Vui lòng nhập đầy đủ thông tin");
             txtthongbao.setVisibility(View.VISIBLE);
             return;
         }
-        mAuth.createUserWithEmailAndPassword(mail, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            txtthongbao.setText("Đăng ký thành công");
-                            txtthongbao.setVisibility(View.VISIBLE);
-                            navigateToLogin();
-                        } else {
-                            txtthongbao.setText("Tài khoản đã tồn tại");
-                            txtthongbao.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
+
+        // Kiểm tra xem tài khoản đã tồn tại chưa
+        if (dbHelper.isEmailExists(mail)) {
+            txtthongbao.setText("Tài khoản đã tồn tại");
+            txtthongbao.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        // Tạo đối tượng User mới
+        long NewUser = dbHelper.addUser(firstName, lastName, mail, password);
+
+        if (NewUser != -1) {
+            txtthongbao.setText("Đăng ký thành công");
+            txtthongbao.setVisibility(View.VISIBLE);
+            navigateToLogin();
+        } else {
+            txtthongbao.setText("Đăng ký thất bại, vui lòng thử lại");
+            txtthongbao.setVisibility(View.VISIBLE);
+        }
     }
+
     private void navigateToLogin() {
         Intent intent = new Intent(Register.this, Login.class);
         startActivity(intent);
+        finish();
     }
 }

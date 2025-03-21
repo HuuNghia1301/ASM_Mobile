@@ -7,11 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.asm_ad.Database.UserDatabaseHelper;
 
 public class Login extends AppCompatActivity {
 
@@ -19,10 +20,9 @@ public class Login extends AppCompatActivity {
     private EditText editPassword;
     private Button btnLogin;
     private TextView txtthongbao;
-    private FirebaseAuth mAuth;
     private Button btnSign;
     private SharedPreferences sharedPreferences;
-
+    private UserDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,8 @@ public class Login extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-        // Khởi tạo FirebaseAuth
-        mAuth = FirebaseAuth.getInstance();
+        // Khởi tạo SQLite Database Helper
+        dbHelper = new UserDatabaseHelper(this);
 
         // Khởi tạo SharedPreferences
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
@@ -41,6 +41,7 @@ public class Login extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         txtthongbao = findViewById(R.id.txtthongbao);
         btnSign = findViewById(R.id.btnSign);
+
         btnLogin.setOnClickListener(v -> loginUser());
         btnSign.setOnClickListener(v -> navigateToRegister());
     }
@@ -55,27 +56,21 @@ public class Login extends AppCompatActivity {
             return;
         }
 
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Lưu trạng thái đăng nhập
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean("isLoggedIn", true);
-                        editor.apply();
+        // Kiểm tra tài khoản trong SQLite
+        boolean isUserValid = dbHelper.checkUser(email, password);
+        if (isUserValid) {
+            // Lưu trạng thái đăng nhập
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isLoggedIn", true);
+            editor.putString("loggedInUser", email);
+            editor.apply();
 
-                        txtthongbao.setText("Đăng nhập thành công");
-                        txtthongbao.setVisibility(View.VISIBLE);
-
-                        navigateToHome();
-
-                    } else {
-                        txtthongbao.setText("Thông Tin Tài Hoặc Tài Khoản Không Chính Xác ");
-                        txtthongbao.setVisibility(View.VISIBLE);
-                    }
-                });
-    }
-    public void Register(View view) {
-        navigateToRegister();
+            Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+            navigateToHome();
+        } else {
+            txtthongbao.setText("Thông Tin Tài Khoản Không Chính Xác");
+            txtthongbao.setVisibility(View.VISIBLE);
+        }
     }
 
     private void navigateToRegister() {
