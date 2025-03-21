@@ -25,12 +25,11 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_FIRST_NAME = "first_name";
     public static final String COLUMN_LAST_NAME = "last_name";
-    public static final String COLUMN_PHONE = "phone";
     public static final String COLUMN_EMAIL = "email";
-    public static final String COLUMN_DOB = "dob"; // Store as DATE
+
     public static final String COLUMN_PASSWORD = "password";
-    public static final String COLUMN_ROLE = "role";
-    public static final String COLUMN_CREATED_AT = "created_at"; // Store as DATETIME
+
+
 
     public UserDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,12 +41,8 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_FIRST_NAME + " TEXT,"
                 + COLUMN_LAST_NAME + " TEXT,"
-                + COLUMN_PHONE + " TEXT,"
                 + COLUMN_EMAIL + " TEXT,"
-                + COLUMN_DOB + " DATE," // DATE type
-                + COLUMN_PASSWORD + " TEXT,"
-                + COLUMN_ROLE + " TEXT,"
-                + COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP" + ")"; // DATETIME type
+                + COLUMN_PASSWORD + " TEXT" +")"; // DATETIME type
         sqLiteDatabase.execSQL(CREATE_USERS_TABLE);
     }
 
