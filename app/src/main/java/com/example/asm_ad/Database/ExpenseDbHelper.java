@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 public class ExpenseDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ASM_CampusExpense_Manager";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     // Table name
     public static final String TABLE_EXPENSE = "Expense";
