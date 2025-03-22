@@ -222,7 +222,6 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
                 double currentBudget = getUserBudget(email);
                 if (currentBudget < amount) {
                     Log.e(TAG, "Số tiền không đủ trong budget!");
-                    return false;
                 }
 
                 // Lưu chi tiêu vào bảng expenses
