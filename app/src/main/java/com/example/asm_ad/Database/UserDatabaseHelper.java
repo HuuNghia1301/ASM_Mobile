@@ -15,7 +15,7 @@ import java.util.List;
 public class UserDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ASM_CampusExpense_Manager";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 1;
 
     // Constants for table and column names
     public static final String TABLE_USERS = "users";

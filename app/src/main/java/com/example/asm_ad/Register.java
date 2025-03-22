@@ -1,6 +1,7 @@
 package com.example.asm_ad;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,7 +11,8 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.asm_ad.Database.UserDatabaseHelper;
+import com.example.asm_ad.Database.DataBaseUserHelper;
+import com.example.asm_ad.Model.User;
 
 
 public class Register extends AppCompatActivity {
@@ -18,7 +20,7 @@ public class Register extends AppCompatActivity {
     private EditText editEmail, editPassword, editFirstName, editLastName;
     private Button btnSign;
     private TextView txtthongbao;
-    private UserDatabaseHelper dbHelper;
+    private DataBaseUserHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,7 @@ public class Register extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
 
-        dbHelper = new UserDatabaseHelper(this);
+        dbHelper = new DataBaseUserHelper(this);
 
         editEmail = findViewById(R.id.editEmail);
         editPassword = findViewById(R.id.editPassword);
@@ -50,17 +52,18 @@ public class Register extends AppCompatActivity {
             return;
         }
 
-        // Kiểm tra xem tài khoản đã tồn tại chưa
-        if (dbHelper.isEmailExists(mail)) {
-            txtthongbao.setText("Tài khoản đã tồn tại");
+       // Kiểm tra xem tài khoản đã tồn tại chưa
+       if (dbHelper.isEmailExists(mail)) {
+           txtthongbao.setText("Tài khoản đã tồn tại");
             txtthongbao.setVisibility(View.VISIBLE);
             return;
         }
-
         // Tạo đối tượng User mới
-        long NewUser = dbHelper.addUser(firstName, lastName, mail, password);
+       User newUser = new User(mail, password, firstName, lastName);
+       double tien = 19000.00;
+       long id = dbHelper.addUser(newUser,tien,"Tiền Mới");
 
-        if (NewUser != -1) {
+        if (id != -1) {
             txtthongbao.setText("Đăng ký thành công");
             txtthongbao.setVisibility(View.VISIBLE);
             navigateToLogin();

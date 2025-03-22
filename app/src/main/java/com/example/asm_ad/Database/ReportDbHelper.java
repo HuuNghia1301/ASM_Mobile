@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 public class ReportDbHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "ASM_CampusExpense_Manager";
+    private static final String DATABASE_NAME = "ASM_CampusExpense_Manager1";
     private static final int DATABASE_VERSION = 1;
 
     // Table name
