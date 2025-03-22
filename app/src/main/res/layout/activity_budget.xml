@@ -1,0 +1,90 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".BudgetActivity">
+
+    <!-- Cuộn toàn bộ nội dung nếu màn hình nhỏ -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Tiêu đề -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quản lý Ngân sách"
+                android:textColor="#212121"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="16dp" />
+
+            <!-- Ô nhập số tiền -->
+            <EditText
+                android:id="@+id/edtBudgetAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nhập số tiền ngân sách"
+                android:inputType="numberDecimal"
+                android:padding="12dp"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:backgroundTint="#FF9800"/>
+
+            <!-- Ô nhập danh mục -->
+            <EditText
+                android:id="@+id/edtBudgetCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nhập danh mục ngân sách"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:backgroundTint="#FF9800"
+                android:layout_marginTop="16dp"/>
+
+            <!-- Nút Lưu -->
+            <Button
+                android:id="@+id/btnSaveBudget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Lưu ngân sách"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#6A4C93"
+                android:layout_marginTop="24dp"/>
+
+            <!-- Danh sách ngân sách -->
+            <TextView
+                android:id="@+id/tvBudgetListTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Danh sách ngân sách"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginTop="32dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBudgets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"/>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

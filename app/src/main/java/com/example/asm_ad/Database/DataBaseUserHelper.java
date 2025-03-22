@@ -1,7 +1,5 @@
 package com.example.asm_ad.Database;
 
-import static com.example.asm_ad.Database.ReportDbHelper.TABLE_USERS;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,10 +9,11 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.asm_ad.Login;
-import com.example.asm_ad.Model.User;
+import com.example.asm_ad.Budget;
+import com.example.asm_ad.User;
 
-import java.security.AccessControlContext;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
@@ -203,10 +202,55 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetAmount;
     }
+    // Lấy ID user từ email
+    public long getUserIdByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long userId = -1;
 
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
+        if (cursor.moveToFirst()) {
+            userId = cursor.getLong(0);
+        }
 
+        cursor.close();
+        db.close();
+        return userId;
+    }
 
+    // Thêm ngân sách vào database
+    public long addBudget(long userId, double amount, String category) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_BUDGET_AMOUNT, amount);
+        values.put(COLUMN_BUDGET_CATEGORY, category);
+        values.put(COLUMN_ID, userId);
 
+        long result = db.insert(TABLE_BUDGET, null, values);
+        db.close();
+        return result;
+    }
+    // Lấy danh sách ngân sách theo userId
+    public List<Budget> getBudgetsByUserId(long userId) {
+        List<Budget> budgets = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
 
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BUDGET + " WHERE " + COLUMN_ID + " = ?",
+                new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Budget budget = new Budget();
+                budget.setId(cursor.getLong(0));           // budget_id
+                budget.setAmount(cursor.getDouble(1));     // amount
+                budget.setCategory(cursor.getString(2));   // category
+                budget.setUserId(cursor.getLong(3));       // user_id
+                budgets.add(budget);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return budgets;
+    }
 
 }
