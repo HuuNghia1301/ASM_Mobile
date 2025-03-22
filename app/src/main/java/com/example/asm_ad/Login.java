@@ -7,12 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.asm_ad.Database.UserDatabaseHelper;
+
+import com.example.asm_ad.Database.DataBaseUserHelper;
 
 public class Login extends AppCompatActivity {
 
@@ -22,7 +22,7 @@ public class Login extends AppCompatActivity {
     private TextView txtthongbao;
     private Button btnSign;
     private SharedPreferences sharedPreferences;
-    private UserDatabaseHelper dbHelper;
+    private DataBaseUserHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Khởi tạo SQLite Database Helper
-        dbHelper = new UserDatabaseHelper(this);
+        dbHelper = new DataBaseUserHelper(this);
 
         // Khởi tạo SharedPreferences
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
@@ -64,7 +64,6 @@ public class Login extends AppCompatActivity {
             editor.putBoolean("isLoggedIn", true);
             editor.putString("loggedInUser", email);
             editor.apply();
-
             Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
             navigateToHome();
         } else {
