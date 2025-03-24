@@ -60,13 +60,14 @@ public class Login extends AppCompatActivity {
         boolean isUserValid = dbHelper.checkUser(email, password);
 
         if (isUserValid) {
-            int userId = dbHelper.getUserIdByEmail(email); // Lấy user_id từ email
+
             // Lưu trạng thái đăng nhập
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isLoggedIn", true);
             editor.putString("loggedInUser", email);
-
+            int userId = dbHelper.getIdUserForEmail(email);
             editor.putInt("userId", userId);
+
             editor.apply();
             Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 

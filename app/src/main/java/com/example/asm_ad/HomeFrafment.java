@@ -2,9 +2,9 @@ package com.example.asm_ad;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.example.asm_ad.Database.DataBaseUserHelper;
@@ -24,92 +23,62 @@ public class HomeFrafment extends Fragment {
     private TextView user;
     private DataBaseUserHelper dbHelper;
     private SharedPreferences sharedPreferences;
-    private TextView tien;
-    private CardView cardView;
-    private Button btn;
-    private Button btnExit , btnAddBudgetAmount;
-    private TextView txtBudgetAmount;
+
+
+    private Button btnaddBudget;
+
+    private TextView txtBudget;
 
     private int userId;
 
-    @SuppressLint("MissingInflatedId")
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         user = view.findViewById(R.id.user);
-        tien = view.findViewById(R.id.tien); // Cần khai báo trong XML
-        cardView = view.findViewById(R.id.cardview1);
-        btn = view.findViewById(R.id.btn1);
+        txtBudget = view.findViewById(R.id.txtBudget); // Cần khai báo trong XML
 
-        btnExit = view.findViewById(R.id.btnExit);
-        txtBudgetAmount = view.findViewById(R.id.txtBudgetAmount);
-        btnAddBudgetAmount = view.findViewById(R.id.btnaddBudgetAmount);
+        btnaddBudget = view.findViewById(R.id.addBudget);
+
         // Khởi tạo database helper
 
         dbHelper = new DataBaseUserHelper(requireContext());
 
-        cardView.setVisibility(View.GONE); // Ẩn hoàn toàn
-        // khởi tạo lấy id để thêm sửa xóa budget
-        sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-        int id = sharedPreferences.getInt("userId", -1);
-        userId = id;
 
-        btn.setOnClickListener(v -> showCardView());
+        btnaddBudget.setOnClickListener(v -> showAddBudget());
 
-        btnExit.setOnClickListener(v -> hideCardView());
-        btnAddBudgetAmount.setOnClickListener(v -> updateBudgetAmount());
-        // Lấy email từ SharedPreferences
         getUserName();
-        tien();
+        showBudget();
         return view;
     }
     public void getUserName() {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
-        String userEmail = sharedPreferences.getString("loggedInUser", "");
-
-        dbHelper.getUserFullname(userEmail);
-      user.setText("Welcome :" + dbHelper.getUserFullname(userEmail));
-
+        int userId = sharedPreferences.getInt("userId", -1);
+        dbHelper.getUserFullname(userId);
+        user.setText("Welcome :" + dbHelper.getUserFullname(userId));
     }
-    public void tien(){
+    public void showAddBudget(){
+        Intent intent = new Intent(getActivity(), BudgetActivity.class);
+        startActivity(intent);
+    }
+    public void showBudget() {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
-        String userEmail = sharedPreferences.getString("loggedInUser", "");
-        dbHelper.getUserBudget(userEmail);
+        int userId = sharedPreferences.getInt("userId", -1);
 
-        if (!userEmail.isEmpty()) {
-            // Gọi hàm lấy số tiền của user
-            double userBudget = dbHelper.getUserBudget(userEmail);
-            Log.d("Budget", "Total $ " + userBudget);
-            // Hiển thị số tiền lên TextView
-            tien.setText("Total $:" + userBudget + " VND");
-        } else {
-            Log.d("Budget", "Không tìm thấy email user");
-            tien.setText("Không có dữ liệu");
-        }
-    }
-    public void showCardView() {
-        cardView.setVisibility(View.VISIBLE);
-    }
-    public void hideCardView() {
-        cardView.setVisibility(View.GONE);
-    }
-    public void updateBudgetAmount() {
-        String budgetText = txtBudgetAmount.getText().toString().trim();
-        double newBudgetAmount = Double.parseDouble(budgetText);
-        if(newBudgetAmount > 0){
-            dbHelper.updateBudgetAmount(userId,newBudgetAmount) ;
-            tien();
-            txtBudgetAmount.setText("");
-            hideCardView();
-        }
-        else {
+        double budget = dbHelper.getUserBudget(userId); // Lấy tổng số tiền budget
+        String budgetText = String.valueOf(budget); // Chuyển từ double sang String
 
-        }
+        txtBudget.setText("Budget $ "+ budgetText); // Gán vào TextView
+    }
 
 
-    }
+
+
+
+
+
 }
 
 

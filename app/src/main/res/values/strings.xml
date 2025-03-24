@@ -3,4 +3,10 @@
     <string name="action_home">Home</string>
     <string name="action_expense">Expense</string>
     <string name="action_setting">Setting</string>
+    <string name="budget_title">Budget Management</string>
+    <string name="enter_budget">Enter budget amount...</string>
+    <string name="enter_category">Enter budget category...</string>
+    <string name="save_budget">Save budget</string>
+
+
 </resources>

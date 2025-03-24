@@ -26,13 +26,13 @@
         app:cardCornerRadius="80sp">
 
         <TextView
-            android:id="@+id/tien"
+            android:id="@+id/txtBudget"
             android:layout_width="289dp"
             android:layout_height="68dp"
             android:layout_gravity="center|top"
             android:layout_marginTop="40sp"
             android:gravity="start"
-            android:text="Expense"
+            android:text="Budget "
             android:textColor="@color/black"
             android:textSize="30sp" />
 
@@ -44,51 +44,8 @@
         android:gravity="bottom|center"
         android:orientation="vertical">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardview1"
-            android:layout_width="384dp"
-            android:layout_height="431dp"
-            android:layout_gravity="center"
-            android:visibility="visible"
-            app:cardBackgroundColor="#E5EBF0"
-            app:cardCornerRadius="10sp">
-
-            <Button
-                android:id="@+id/btnaddBudgetAmount"
-                android:layout_width="220dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center"
-                android:layout_margin="30dp"
-                android:backgroundTint="#578FCA"
-                android:text="ADD BudgetAmount"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/txtBudgetAmount"
-                android:layout_width="283dp"
-                android:layout_height="84dp"
-                android:layout_gravity="center"
-                android:ems="10"
-                android:foregroundGravity="center"
-                android:hint="BudgetAmount"
-                android:inputType="text"
-                android:minHeight="48dp" />
-
-            <Button
-                android:id="@+id/btnExit"
-                android:layout_width="63dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_margin="25sp"
-                android:rotation="1"
-                android:rotationY="-1"
-                android:text="X"
-                android:textColorLink="#FFFFFF" />
-
-        </androidx.cardview.widget.CardView>
-
         <Button
-            android:id="@+id/btn1"
+            android:id="@+id/addBudget"
             android:layout_width="64dp"
             android:layout_height="48dp"
             android:layout_marginTop="10dp"
