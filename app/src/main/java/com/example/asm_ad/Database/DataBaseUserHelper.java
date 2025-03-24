@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.nfc.Tag;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -203,9 +204,77 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetAmount;
     }
+    public String getUserFullname(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String fullname = "";
+        Cursor cursor = null;
 
+        try {
+            String query = "SELECT " + COLUMN_LASTNAME + ", " + COLUMN_FIRSTNAME +
+                    " FROM " + TABLE_USER +
+                    " WHERE " + COLUMN_EMAIL + " = ?";
+            cursor = db.rawQuery(query, new String[]{email});
 
+            if (cursor.moveToFirst()) {
+                fullname = cursor.getString(0) + " " + cursor.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();  // Đảm bảo đóng con trỏ
+            }
+            db.close();  // Đóng database sau khi sử dụng
+        }
+        return fullname;
+    }
+    public int getUserIdByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int userId = -1; // Giá trị mặc định nếu không tìm thấy
+        Cursor cursor = null;
 
+        try {
+            String query = "SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?";
+            cursor = db.rawQuery(query, new String[]{email});
+
+            if (cursor.moveToFirst()) {
+                userId = cursor.getInt(0); // Lấy user_id
+                Log.d("DatabaseHelper", "✅ Lấy userId thành công: " + userId + " cho email: " + email);
+            } else {
+                Log.e("DatabaseHelper", "❌ Không tìm thấy userId cho email: " + email);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+
+        return userId;
+    }
+
+    public void updateBudgetAmount(int userId, double newBudgetAmount) {
+        SQLiteDatabase db = this.getWritableDatabase(); // Mở database để ghi dữ liệu
+        try {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_BUDGET_AMOUNT, newBudgetAmount);
+
+            // Cập nhật bảng Budget theo user_id
+            int rowsAffected = db.update(TABLE_BUDGET, values, "id = ?", new String[]{String.valueOf(userId)});
+
+            if (rowsAffected > 0) {
+                Log.e(TAG, "updateBudgetAmount: " + userId);
+            } else {
+                Log.e(TAG, "loi: " + userId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close(); // Đóng database sau khi cập nhật
+        }
+
+    }
 
 
 

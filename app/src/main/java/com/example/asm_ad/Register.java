@@ -60,8 +60,8 @@ public class Register extends AppCompatActivity {
         }
         // Tạo đối tượng User mới
        User newUser = new User(mail, password, firstName, lastName);
-       double tien = 19000.00;
-       long id = dbHelper.addUser(newUser,tien,"Tiền Mới");
+       double tien = 0;
+       long id = dbHelper.addUser(newUser,tien,"TOTAl");
 
         if (id != -1) {
             txtthongbao.setText("Đăng ký thành công");
