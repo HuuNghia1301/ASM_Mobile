@@ -1,7 +1,6 @@
 package com.example.asm_ad;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,7 +11,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.asm_ad.Database.DataBaseUserHelper;
-import com.example.asm_ad.Model.User;
 
 
 public class Register extends AppCompatActivity {

@@ -136,7 +136,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
             Log.e(TAG, "Lỗi khi thêm user và budget: ", e);
         } finally {
             db.endTransaction(); // Kết thúc transaction
-//            db.close();
+            db.close();
         }
 
         return (userId != -1 && budgetId != -1) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
@@ -162,7 +162,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
-//        db.close();
+        db.close();
 
         Log.d(TAG, "checkUser: Kiểm tra user " + username + " - Kết quả: " + (count > 0));
         return count > 0;
@@ -172,7 +172,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT 1 FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
         boolean exists = cursor.getCount() > 0;
         cursor.close();
-//        db.close();
+        db.close();
         return exists;
     }
     public double getUserBudget(String email) {
@@ -198,70 +198,15 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.e(TAG, "Lỗi khi lấy budget của user", e);
         } finally {
-//            db.close();
+            db.close();
         }
 
         return budgetAmount;
     }
-    public boolean addExpense(String email, double amount, String category, String date) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.beginTransaction();
 
-        boolean success = false;
 
-        try {
-            // Lấy user ID
-            String query = "SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?";
-            Cursor cursor = db.rawQuery(query, new String[]{email});
 
-            if (cursor.moveToFirst()) {
-                int userId = cursor.getInt(0);
-                cursor.close();
 
-                // Kiểm tra số tiền budget còn lại
-                double currentBudget = getUserBudget(email);
-                if (currentBudget < amount) {
-                    Log.e(TAG, "Số tiền không đủ trong budget!");
-                }
 
-                // Lưu chi tiêu vào bảng expenses
-                ContentValues expenseValues = new ContentValues();
-                expenseValues.put(COLUMN_EXPENSE_AMOUNT, amount);
-                expenseValues.put(COLUMN_EXPENSE_CATEGORY, category);
-                expenseValues.put(COLUMN_EXPENSE_DATE, date);
-                expenseValues.put(COLUMN_ID, userId);
 
-                long result = db.insert(TABLE_EXPENSES, null, expenseValues);
-                if (result == -1) {
-                    throw new Exception("Lỗi khi thêm chi tiêu!");
-                }
-
-                // Cập nhật budget
-                ContentValues budgetValues = new ContentValues();
-                budgetValues.put(COLUMN_BUDGET_AMOUNT, currentBudget - amount);
-
-                int rows = db.update(TABLE_BUDGET, budgetValues, COLUMN_ID + " = ?", new String[]{String.valueOf(userId)});
-                if (rows == 0) {
-                    throw new Exception("Lỗi khi cập nhật budget!");
-                }
-
-                db.setTransactionSuccessful();
-                success = true;
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi thêm chi tiêu", e);
-        } finally {
-            db.endTransaction();
-            db.close();
-        }
-
-        return success;
-    }
-
-    public Cursor getLoggedInUser() {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        return db.rawQuery("SELECT email FROM users", null);
-    }
 }
