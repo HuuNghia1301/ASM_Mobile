@@ -1,22 +1,27 @@
-package com.example.asm_ad;
+package com.example.asm_ad.Model;
 
 public class Budget {
     private long id;
     private long userId;
     private double amount;
     private String category;
-    private String createdAt;
+
 
     // Constructor mặc định
     public Budget() {}
 
     // Constructor đầy đủ
-    public Budget(long id, long userId, double amount, String category, String createdAt) {
+    public Budget(long id, long userId, double amount, String category) {
         this.id = id;
         this.userId = userId;
         this.amount = amount;
         this.category = category;
-        this.createdAt = createdAt;
+
+    }
+    public Budget(long userId,double amount, String category) {
+        this.userId = userId;
+        this.amount = amount;
+        this.category = category;
     }
 
     // Constructor mới cho BudgetAdapter
@@ -38,6 +43,5 @@ public class Budget {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
 }

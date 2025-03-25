@@ -1,5 +1,7 @@
 package com.example.asm_ad.Database;
 
+import static com.example.asm_ad.Database.ReportDbHelper.TABLE_USERS;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,14 +11,18 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.asm_ad.Model.User;
+import com.example.asm_ad.Budget;
+import com.example.asm_ad.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
 
     // Thông tin database
     private static final String DATABASE_NAME = "UserManager.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_USER = "users";
 
@@ -36,12 +42,14 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final String COLUMN_EXPENSE_CATEGORY = "category";
     private static final String COLUMN_EXPENSE_DATE = "date";
 
-
     // Bảng Budget
     private static final String TABLE_BUDGET = "budget";
     private static final String COLUMN_BUDGET_ID = "budget_id";
     private static final String COLUMN_BUDGET_AMOUNT = "amount";
     private static final String COLUMN_BUDGET_CATEGORY = "category";
+
+
+
 
     public DataBaseUserHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -86,33 +94,15 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
-        onCreate(db);
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+
     }
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(TAG, "Downgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
-
-        // Xóa database cũ
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
-
-        // Tạo lại database
-        onCreate(db);
-    }
-
 
     public long addUser(User user, double budgetAmount, String budgetCategory) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction(); // Bắt đầu transaction
 
         long userId = -1;
-        long budgetId = -1;
 
         try {
             // Thêm user vào bảng users
@@ -143,18 +133,38 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
             }
 
             Log.d(TAG, "Budget đã được thêm thành công với ID: " + budgetId);
+
             db.setTransactionSuccessful(); // Đánh dấu transaction thành công
         } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi thêm user và budget: ", e);
+            Log.e(TAG, "Lỗi khi thêm user : ", e);
         } finally {
             db.endTransaction(); // Kết thúc transaction
-//            db.close();
+            db.close();
         }
 
-        return (userId != -1 && budgetId != -1) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
+        return (userId != -1 ) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
     }
-
-
+    public long addBudget(double amount, String category, long userId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_BUDGET_AMOUNT, amount);
+        contentValues.put(COLUMN_BUDGET_CATEGORY, category);
+        contentValues.put(COLUMN_ID, userId);
+        db.insert(TABLE_BUDGET, null, contentValues);
+        return userId;
+    }
+    public int getIdUserForEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        int userId = -1; // Mặc định nếu không tìm thấy
+        if (cursor.moveToFirst()) { // Kiểm tra nếu có dữ liệu
+            userId = cursor.getInt(0); // Lấy ID từ cột đầu tiên
+        }
+        cursor.close(); // Đóng Cursor để tránh rò rỉ bộ nhớ
+        db.close(); // Đóng database
+        return userId;
+    }
     public boolean checkUser(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -174,7 +184,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
-//        db.close();
+        db.close();
 
         Log.d(TAG, "checkUser: Kiểm tra user " + username + " - Kết quả: " + (count > 0));
         return count > 0;
@@ -184,83 +194,85 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT 1 FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
         boolean exists = cursor.getCount() > 0;
         cursor.close();
-//        db.close();
+        db.close();
         return exists;
     }
-    public double getUserBudget(String email) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        double budgetAmount = 0.0;
 
-        Cursor cursor = null;
+    public String getUserFullname(int IdUser) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String fullname = "";
+
         try {
-            String query = "SELECT " + COLUMN_BUDGET_AMOUNT +
-                    " FROM " + TABLE_BUDGET +
-                    " WHERE " + COLUMN_ID +
-                    " = (SELECT " + COLUMN_ID +
+            String query = "SELECT " + COLUMN_LASTNAME + ", " + COLUMN_FIRSTNAME +
                     " FROM " + TABLE_USER +
                     " WHERE " + COLUMN_EMAIL + " = ?)";
 
-            cursor = db.rawQuery(query, new String[]{email});
+            Cursor cursor = db.rawQuery(query, new String[]{email});
 
             if (cursor.moveToFirst()) {
-                budgetAmount = cursor.getDouble(0);
+                String lastName = cursor.getString(0);
+                String firstName = cursor.getString(1);
+                fullname = lastName + " " + firstName;
             }
 
             cursor.close();
-            Log.d(TAG, "getUserBudget: Số tiền budget của " + email + " là " + budgetAmount);
         } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi lấy budget của user", e);
+            e.printStackTrace();
         } finally {
-            if (cursor != null) cursor.close();
+            db.close();
         }
 
-        return budgetAmount;
+        return fullname;
     }
-
-    public boolean addExpense(String email, double amount, String category, String date) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.beginTransaction();
-        boolean success = false;
-
-        try {
-            // Lấy user ID từ bảng users
-            String queryUserId = "SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?";
-            Cursor cursorUser = db.rawQuery(queryUserId, new String[]{email});
-
-            if (cursorUser.moveToFirst()) {
-                int userId = cursorUser.getInt(0);
-                cursorUser.close();
-
-                // Thêm dữ liệu vào bảng expenses
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_EXPENSE_AMOUNT, amount);
-                values.put(COLUMN_EXPENSE_CATEGORY, category);
-                values.put(COLUMN_EXPENSE_DATE, date);
-                values.put(COLUMN_ID, userId);
-
-                long result = db.insert(TABLE_EXPENSES, null, values);
-                if (result != -1) {
-                    success = true;
-                    db.setTransactionSuccessful();
-                }
-            } else {
-                Log.e(TAG, "Không tìm thấy user ID với email: " + email);
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi thêm chi tiêu", e);
-        } finally {
-            db.endTransaction();
-        }
-
-        return success;
-    }
-
-
-
-
-    public Cursor getLoggedInUser() {
+    // Lấy ID user từ email
+    public long getUserIdByEmail(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT email FROM " + TABLE_USER + " LIMIT 1", null);
+        long userId = -1;
+
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
+        if (cursor.moveToFirst()) {
+            userId = cursor.getLong(0);
+        }
+
+        cursor.close();
+        db.close();
+        return userId;
     }
+
+    // Thêm ngân sách vào database
+    public long addBudget(long userId, double amount, String category) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_BUDGET_AMOUNT, amount);
+        values.put(COLUMN_BUDGET_CATEGORY, category);
+        values.put(COLUMN_ID, userId);
+
+        long result = db.insert(TABLE_BUDGET, null, values);
+        db.close();
+        return result;
+    }
+    // Lấy danh sách ngân sách theo userId
+    public List<Budget> getBudgetsByUserId(long userId) {
+        List<Budget> budgets = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BUDGET + " WHERE " + COLUMN_ID + " = ?",
+                new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Budget budget = new Budget();
+                budget.setId(cursor.getLong(0));           // budget_id
+                budget.setAmount(cursor.getDouble(1));     // amount
+                budget.setCategory(cursor.getString(2));   // category
+                budget.setUserId(cursor.getLong(3));       // user_id
+                budgets.add(budget);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return budgets;
+    }
+
 }

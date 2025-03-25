@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,47 +17,70 @@ import androidx.fragment.app.Fragment;
 
 import com.example.asm_ad.Database.DataBaseUserHelper;
 
+
 public class HomeFrafment extends Fragment {
-    private Button btnBudget;
+
     private TextView user;
     private DataBaseUserHelper dbHelper;
-    private TextView tien;
+    private SharedPreferences sharedPreferences;
 
-    @SuppressLint("MissingInflatedId")
+
+    private Button btnaddBudget;
+
+    private TextView txtBudget;
+
+    private int userId;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         user = view.findViewById(R.id.user);
-        tien = view.findViewById(R.id.tien);
-        btnBudget = view.findViewById(R.id.btnBudget); // Đã sửa vị trí khai báo
+        txtBudget = view.findViewById(R.id.txtBudget); // Cần khai báo trong XML
+
+        btnaddBudget = view.findViewById(R.id.addBudget);
 
         // Khởi tạo database helper
+
         dbHelper = new DataBaseUserHelper(requireContext());
 
-        // Lấy email từ SharedPreferences
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-        String userEmail = sharedPreferences.getString("loggedInUser", "");
 
-        if (!userEmail.isEmpty()) {
-            // Gọi hàm lấy số tiền của user
-            double userBudget = dbHelper.getUserBudget(userEmail);
-            Log.d("Budget", "Số tiền của user: " + userBudget);
+        btnaddBudget.setOnClickListener(v -> showAddBudget());
 
-            // Hiển thị số tiền lên TextView
-            tien.setText("Số tiền của bạn: " + userBudget + " VND");
-        } else {
-            Log.d("Budget", "Không tìm thấy email user");
-            tien.setText("Không có dữ liệu");
-        }
-
-        // Sự kiện click cho nút btnBudget
-        btnBudget.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), BudgetActivity.class);
-            startActivity(intent);
-        });
-
+        getUserName();
+        showBudget();
         return view;
     }
+    public void getUserName() {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("userId", -1);
+        dbHelper.getUserFullname(userId);
+        user.setText("Welcome :" + dbHelper.getUserFullname(userId));
+    }
+    public void showAddBudget(){
+        Intent intent = new Intent(getActivity(), BudgetActivity.class);
+        startActivity(intent);
+    }
+    public void showBudget() {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("userId", -1);
+
+        double budget = dbHelper.getUserBudget(userId); // Lấy tổng số tiền budget
+        String budgetText = String.valueOf(budget); // Chuyển từ double sang String
+
+        txtBudget.setText("Budget $ "+ budgetText); // Gán vào TextView
+    }
+
+
+
+
+
+
+
 }
+
+
+
+

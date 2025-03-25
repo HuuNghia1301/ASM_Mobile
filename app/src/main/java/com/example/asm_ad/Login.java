@@ -58,13 +58,19 @@ public class Login extends AppCompatActivity {
 
         // Kiểm tra tài khoản trong SQLite
         boolean isUserValid = dbHelper.checkUser(email, password);
+
         if (isUserValid) {
+
             // Lưu trạng thái đăng nhập
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isLoggedIn", true);
             editor.putString("loggedInUser", email);
+            int userId = dbHelper.getIdUserForEmail(email);
+            editor.putInt("userId", userId);
+
             editor.apply();
             Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+
             navigateToHome();
         } else {
             txtthongbao.setText("Thông Tin Tài Khoản Không Chính Xác");
