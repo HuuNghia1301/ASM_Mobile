@@ -11,6 +11,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.asm_ad.Database.DataBaseUserHelper;
+import com.example.asm_ad.Model.User;
 
 
 public class Register extends AppCompatActivity {

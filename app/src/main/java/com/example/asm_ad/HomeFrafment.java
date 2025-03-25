@@ -2,12 +2,14 @@ package com.example.asm_ad;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,14 +18,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.asm_ad.Database.DataBaseUserHelper;
 
-
 public class HomeFrafment extends Fragment {
-
+    private Button btnBudget;
     private TextView user;
     private DataBaseUserHelper dbHelper;
-    private SharedPreferences sharedPreferences;
     private TextView tien;
-
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -32,13 +31,14 @@ public class HomeFrafment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         user = view.findViewById(R.id.user);
-        tien = view.findViewById(R.id.tien); // Cần khai báo trong XML
+        tien = view.findViewById(R.id.tien);
+        btnBudget = view.findViewById(R.id.btnBudget); // Đã sửa vị trí khai báo
 
         // Khởi tạo database helper
         dbHelper = new DataBaseUserHelper(requireContext());
 
         // Lấy email từ SharedPreferences
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String userEmail = sharedPreferences.getString("loggedInUser", "");
 
         if (!userEmail.isEmpty()) {
@@ -53,22 +53,12 @@ public class HomeFrafment extends Fragment {
             tien.setText("Không có dữ liệu");
         }
 
+        // Sự kiện click cho nút btnBudget
+        btnBudget.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), BudgetActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 }
-
-//    private void getUser() {
-//        //  Lấy email từ SharedPreferences
-//        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-//        String userEmail = sharedPreferences.getString("loggedInUser", "Không có email");
-//        DataBaseUserHelper dbHelper = new DataBaseUserHelper(requireContext());
-//        //  Lấy tên người dùng từ cơ sở dữ liệu dựa vào email
-//        dbHelper.getUserFullname(userEmail);
-//        // Hiển thị email lên TextView
-//        String fullName = dbHelper.getUserFullname(userEmail);
-//
-//        user.setText("Welcome : " + fullName);
-//    }
-
-
-
