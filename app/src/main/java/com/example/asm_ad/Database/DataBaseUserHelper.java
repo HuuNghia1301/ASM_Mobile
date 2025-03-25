@@ -15,6 +15,8 @@ import com.example.asm_ad.Login;
 import com.example.asm_ad.Model.User;
 
 import java.security.AccessControlContext;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
@@ -24,7 +26,6 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_USER = "users";
-
     // Tên các cột
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_EMAIL = "email";
@@ -99,10 +100,9 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
     public long addUser(User user, double budgetAmount, String budgetCategory) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.beginTransaction(); // Bắt đầu transaction
 
         long userId = -1;
-        long budgetId = -1;
+
 
         try {
             // Thêm user vào bảng users
@@ -120,29 +120,15 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
             Log.d(TAG, "User đã được thêm thành công với ID: " + userId);
 
-            // Thêm dữ liệu vào bảng budget
-            ContentValues budgetValues = new ContentValues();
-            budgetValues.put(COLUMN_BUDGET_AMOUNT, budgetAmount);
-            budgetValues.put(COLUMN_BUDGET_CATEGORY,budgetCategory);
-            budgetValues.put(COLUMN_ID, userId); // Gán userId vào budget
-
-            budgetId = db.insert(TABLE_BUDGET, null, budgetValues);
-
-            if (budgetId == -1) {
-                throw new Exception("Lỗi khi thêm budget");
-            }
-
-            Log.d(TAG, "Budget đã được thêm thành công với ID: " + budgetId);
-
             db.setTransactionSuccessful(); // Đánh dấu transaction thành công
         } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi thêm user và budget: ", e);
+            Log.e(TAG, "Lỗi khi thêm user  ", e);
         } finally {
-            db.endTransaction(); // Kết thúc transaction
+
             db.close();
         }
 
-        return (userId != -1 && budgetId != -1) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
+        return (userId != -1 ) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
     }
     public long addBudget(double amount, String category, long userId){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -248,7 +234,31 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetAmount;
     }
+    public List<String[]> getUserBudgets(int userId) {
+        List<String[]> budgetList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
 
+        try {
+            String query = "SELECT " + COLUMN_BUDGET_AMOUNT + ", " + COLUMN_BUDGET_CATEGORY +
+                    " FROM " + TABLE_BUDGET + " WHERE " + COLUMN_ID + " = ?";
+
+            cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            while (cursor.moveToNext()) {
+                String amount = cursor.getString(0);
+                String category = cursor.getString(1);
+                budgetList.add(new String[]{amount, category});
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+
+        return budgetList;
+    }
 
 
 

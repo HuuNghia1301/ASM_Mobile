@@ -24,7 +24,6 @@ public class HomeFrafment extends Fragment {
     private DataBaseUserHelper dbHelper;
     private SharedPreferences sharedPreferences;
 
-
     private Button btnaddBudget;
 
     private TextView txtBudget;
@@ -45,7 +44,6 @@ public class HomeFrafment extends Fragment {
         // Khởi tạo database helper
 
         dbHelper = new DataBaseUserHelper(requireContext());
-
 
         btnaddBudget.setOnClickListener(v -> showAddBudget());
 
