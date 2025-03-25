@@ -15,6 +15,12 @@ public class Expense {
         this.category = category;
         this.date = date;
     }
+    public Expense(long userId, double amount, String category, String date) {
+        this.userId = userId;
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+    }
 
     public long getExpense_id() {
         return expense_id;

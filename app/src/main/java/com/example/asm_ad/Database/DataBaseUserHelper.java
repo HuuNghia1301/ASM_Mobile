@@ -1,7 +1,5 @@
 package com.example.asm_ad.Database;
 
-import static com.example.asm_ad.Database.ReportDbHelper.TABLE_USERS;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,10 +9,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.asm_ad.Login;
 import com.example.asm_ad.Model.User;
 
-import java.security.AccessControlContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,6 +135,17 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.insert(TABLE_BUDGET, null, contentValues);
         return userId;
     }
+    public long addExpense(int userId, double amount, String category, String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_EXPENSE_AMOUNT, amount);
+        contentValues.put(COLUMN_EXPENSE_CATEGORY, category);
+        contentValues.put(COLUMN_EXPENSE_DATE, date);
+        contentValues.put(COLUMN_ID, userId);
+        db.insert(TABLE_EXPENSES, null, contentValues);
+
+        return userId;
+    }
     public int getIdUserForEmail(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?";
@@ -259,8 +266,5 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetList;
     }
-
-
-
 
 }
