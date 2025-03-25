@@ -49,16 +49,16 @@ public class HomeFrafment extends Fragment {
 
         btnaddBudget.setOnClickListener(v -> showAddBudget());
 
-        getUserName();
+//        getUserName();
         showBudget();
         return view;
     }
-    public void getUserName() {
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
-        int userId = sharedPreferences.getInt("userId", -1);
-        dbHelper.getUserFullname(userId);
-        user.setText("Welcome :" + dbHelper.getUserFullname(userId));
-    }
+//    public void getUserName() {
+//        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
+//        int userId = sharedPreferences.getInt("userId", -1);
+//        dbHelper.getUserFullname(userId);
+//        user.setText("Welcome :" + dbHelper.getUserFullname(userId));
+//    }
     public void showAddBudget(){
         Intent intent = new Intent(getActivity(), BudgetActivity.class);
         startActivity(intent);
@@ -67,18 +67,11 @@ public class HomeFrafment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
 
-        double budget = dbHelper.getUserBudget(userId); // Lấy tổng số tiền budget
+        double budget = dbHelper.getUserBudget(String.valueOf(userId)); // Lấy tổng số tiền budget
         String budgetText = String.valueOf(budget); // Chuyển từ double sang String
 
         txtBudget.setText("Budget $ "+ budgetText); // Gán vào TextView
     }
-
-
-
-
-
-
-
 }
 
 
