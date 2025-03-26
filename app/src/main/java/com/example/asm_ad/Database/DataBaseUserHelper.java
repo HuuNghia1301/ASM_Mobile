@@ -45,15 +45,10 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final String COLUMN_BUDGET_CATEGORY = "category";
 
 
-
-
     public DataBaseUserHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         Log.d(TAG, "DatabaseHelper: Khởi tạo database");
     }
-
-
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "Creating database tables...");
@@ -94,7 +89,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
     }
 
-    public long addUser(User user, double budgetAmount, String budgetCategory) {
+    public long addUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         long userId = -1;
@@ -113,7 +108,6 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
             if (userId == -1) {
                 throw new Exception("Lỗi khi thêm user");
             }
-
             Log.d(TAG, "User đã được thêm thành công với ID: " + userId);
 
             db.setTransactionSuccessful(); // Đánh dấu transaction thành công
@@ -123,7 +117,6 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
             db.close();
         }
-
         return (userId != -1 ) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
     }
     public long addBudget(double amount, String category, long userId){
@@ -133,6 +126,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_BUDGET_CATEGORY, category);
         contentValues.put(COLUMN_ID, userId);
         db.insert(TABLE_BUDGET, null, contentValues);
+        db.close();
         return userId;
     }
     public long addExpense(int userId, double amount, String category, String date) {
@@ -143,7 +137,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_EXPENSE_DATE, date);
         contentValues.put(COLUMN_ID, userId);
         db.insert(TABLE_EXPENSES, null, contentValues);
-
+        db.close();
         return userId;
     }
     public int getIdUserForEmail(String email) {
@@ -182,6 +176,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         Log.d(TAG, "checkUser: Kiểm tra user " + username + " - Kết quả: " + (count > 0));
         return count > 0;
     }
+
     public boolean isEmailExists(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT 1 FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
@@ -190,6 +185,28 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
+    public boolean isBudgetCategoryExists(String category, int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM " + TABLE_BUDGET + " WHERE " + COLUMN_BUDGET_CATEGORY + " = ? AND " + COLUMN_ID + " = ?",
+                new String[]{category, String.valueOf(userId)}
+        );
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
+    public boolean deleteBudgetByCategory(String category, int userID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rowsDeleted = db.delete(
+                TABLE_BUDGET,
+                COLUMN_BUDGET_CATEGORY + " = ? AND " + COLUMN_ID + " = ?",
+                new String[]{category, String.valueOf(userID)}
+        );
+        db.close();
+        return rowsDeleted > 0; // Trả về true nếu xóa thành công, ngược lại false
+    }
+
 
     public String getUserFullname(int IdUser) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -266,5 +283,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetList;
     }
+
+
 
 }

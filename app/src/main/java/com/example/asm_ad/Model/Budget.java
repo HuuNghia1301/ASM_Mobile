@@ -18,6 +18,7 @@ public class Budget {
         this.category = category;
 
     }
+
     public Budget(long userId,double amount, String category) {
         this.userId = userId;
         this.amount = amount;
@@ -26,6 +27,11 @@ public class Budget {
 
     // Constructor mới cho BudgetAdapter
     public Budget(String category, double amount) {
+        this.category = category;
+        this.amount = amount;
+    }
+    public Budget(int id, String category, double amount) {
+        this.id = id;
         this.category = category;
         this.amount = amount;
     }
