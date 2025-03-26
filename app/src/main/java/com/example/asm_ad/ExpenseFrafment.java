@@ -51,14 +51,29 @@ public class ExpenseFrafment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
         double amount;
+
         try {
             amount = Double.parseDouble(amountStr);
         } catch (NumberFormatException e) {
+            Toast.makeText(getActivity(), "Vui lòng nhập số hợp lệ!", Toast.LENGTH_SHORT).show();
             return;
         }
+
         long insertedId = dbHelper.addExpense(userId, amount, category, date);
         if (insertedId != -1) {
             Toast.makeText(getActivity(), "Chi tiêu đã được lưu!", Toast.LENGTH_SHORT).show();
+
+            // Làm mới danh sách chi tiêu trong HomeFragment
+            Fragment homeFragment = getParentFragmentManager().findFragmentById(R.id.main);
+            if (homeFragment instanceof HomeFrafment) {
+                ((HomeFrafment) homeFragment).loadExpenses();
+            }
+            if (insertedId != -1) {
+                etAmount.setText("");
+                etCategory.setText("");
+                etDate.setText("");
+            }
+
         }
     }
 
@@ -66,7 +81,7 @@ public class ExpenseFrafment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
 
-        double budget = dbHelper.getUserBudget(String.valueOf(userId)); // Lấy tổng số tiền budget
+        double budget = dbHelper.getUserBudget(userId); // Lấy tổng số tiền budget
         String budgetText = String.valueOf(budget); // Chuyển từ double sang String
 
 

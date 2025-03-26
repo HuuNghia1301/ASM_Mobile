@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,7 +53,7 @@ public class BudgetActivity extends AppCompatActivity {
 
         budgetList = new ArrayList<>();
         budgetAdapter = new BudgetAdapter(budgetList);
-
+        showViewBudget();
 
 
         // Thiết lập RecyclerView
@@ -71,7 +72,6 @@ public class BudgetActivity extends AppCompatActivity {
                     Toast.makeText(BudgetActivity.this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 double amount = Double.parseDouble(amountStr);
                 budgetList.add(new Budget(category, amount));
                 budgetAdapter.notifyDataSetChanged();
@@ -95,7 +95,7 @@ public class BudgetActivity extends AppCompatActivity {
             Toast.makeText(this, "Số tiền không hợp lệ!", Toast.LENGTH_SHORT).show();
             return;
         }
-        long insertedId = dbHelper.addBudget(userId, amount, category);
+        long insertedId = dbHelper.addBudget(amount, category, userId);
         if (insertedId != -1) {
             Toast.makeText(this, "Ngân sách đã được lưu!", Toast.LENGTH_SHORT).show();
         } else {
@@ -105,5 +105,25 @@ public class BudgetActivity extends AppCompatActivity {
     public void backToHome(){
         Intent intent = new Intent(BudgetActivity.this, Home.class);
         startActivity(intent);
+    }
+    public void showViewBudget() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("userId", -1);
+
+        // Lấy danh sách ngân sách từ SQLite
+        List<String[]> budgets = dbHelper.getUserBudgets(userId);
+
+        // Xóa danh sách cũ để cập nhật mới
+        budgetList.clear();
+
+        // Duyệt danh sách và thêm vào budgetList
+        for (String[] budget : budgets) {
+            String category = budget[1];
+            double amount = Double.parseDouble(budget[0]); // Chuyển đổi từ String -> double
+            budgetList.add(new Budget(category, amount));
+        }
+
+        // Cập nhật RecyclerView
+        budgetAdapter.notifyDataSetChanged();
     }
 }

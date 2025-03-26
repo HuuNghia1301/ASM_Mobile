@@ -65,8 +65,8 @@ public class Login extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isLoggedIn", true);
             editor.putString("loggedInUser", email);
-            double userId = dbHelper.getUserBudget(email);
-            editor.putInt("userId", (int) userId);
+            int userId = dbHelper.getIdUserForEmail(email);
+            editor.putInt("userId", userId);
 
             editor.apply();
             Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();

@@ -1,21 +1,15 @@
 package com.example.asm_ad.Database;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteOpenHelper;
-
-import androidx.annotation.Nullable;
-
-import com.example.asm_ad.Model.Budget;
-import com.example.asm_ad.Model.User;
-
-
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.asm_ad.Model.Expense;
 import com.example.asm_ad.Model.User;
 
 import java.util.ArrayList;
@@ -29,7 +23,6 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_USER = "users";
-
     // Tên các cột
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_EMAIL = "email";
@@ -46,12 +39,14 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final String COLUMN_EXPENSE_CATEGORY = "category";
     private static final String COLUMN_EXPENSE_DATE = "date";
 
-
     // Bảng Budget
     private static final String TABLE_BUDGET = "budget";
     private static final String COLUMN_BUDGET_ID = "budget_id";
     private static final String COLUMN_BUDGET_AMOUNT = "amount";
     private static final String COLUMN_BUDGET_CATEGORY = "category";
+
+
+
 
     public DataBaseUserHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -96,67 +91,15 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
-        onCreate(db);
-    }
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(TAG, "Downgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
-        // Xóa database cũ
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
-
-        // Tạo lại database
-        onCreate(db);
-    }
-    public long addBudget(long userId, double amount, String category) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_BUDGET_AMOUNT, amount);
-        values.put(COLUMN_BUDGET_CATEGORY, category);
-        values.put(COLUMN_ID, userId);
-
-        long result = db.insert(TABLE_BUDGET, null, values);
-        db.close();
-        return result;
-    }
-    public double getUserBudgetById(int userId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        double budgetAmount = 0.0;
-
-        Cursor cursor = null;
-        try {
-            String query = "SELECT " + COLUMN_BUDGET_AMOUNT +
-                    " FROM " + TABLE_BUDGET +
-                    " WHERE " + COLUMN_ID + " = ?";
-
-            cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
-
-            if (cursor.moveToFirst()) {
-                budgetAmount = cursor.getDouble(0);
-            }
-            Log.d(TAG, "getUserBudgetById: Số tiền budget của userId " + userId + " là " + budgetAmount);
-        } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi lấy budget của user", e);
-        } finally {
-            if (cursor != null) cursor.close();
-        }
-
-        return budgetAmount;
     }
 
     public long addUser(User user, double budgetAmount, String budgetCategory) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.beginTransaction(); // Bắt đầu transaction
 
         long userId = -1;
-        long budgetId = -1;
+
 
         try {
             // Thêm user vào bảng users
@@ -174,31 +117,49 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
             Log.d(TAG, "User đã được thêm thành công với ID: " + userId);
 
-            // Thêm dữ liệu vào bảng budget
-            ContentValues budgetValues = new ContentValues();
-            budgetValues.put(COLUMN_BUDGET_AMOUNT, budgetAmount);
-            budgetValues.put(COLUMN_BUDGET_CATEGORY,budgetCategory);
-            budgetValues.put(COLUMN_ID, userId); // Gán userId vào budget
-
-            budgetId = db.insert(TABLE_BUDGET, null, budgetValues);
-
-            if (budgetId == -1) {
-                throw new Exception("Lỗi khi thêm budget");
-            }
-
-            Log.d(TAG, "Budget đã được thêm thành công với ID: " + budgetId);
             db.setTransactionSuccessful(); // Đánh dấu transaction thành công
         } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi thêm user và budget: ", e);
+            Log.e(TAG, "Lỗi khi thêm user  ", e);
         } finally {
-            db.endTransaction(); // Kết thúc transaction
-//            db.close();
+
+            db.close();
         }
 
-        return (userId != -1 && budgetId != -1) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
+        return (userId != -1 ) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
     }
+    public long addBudget(double amount, String category, long userId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_BUDGET_AMOUNT, amount);
+        contentValues.put(COLUMN_BUDGET_CATEGORY, category);
+        contentValues.put(COLUMN_ID, userId);
+        db.insert(TABLE_BUDGET, null, contentValues);
+        return userId;
+    }
+    public long addExpense(int userId, double amount, String category, String date ) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_EXPENSE_AMOUNT, amount);
+        contentValues.put(COLUMN_EXPENSE_CATEGORY, category);
+        contentValues.put(COLUMN_EXPENSE_DATE, date);
+        contentValues.put(COLUMN_ID, userId);
+        db.insert(TABLE_EXPENSES, null, contentValues);
 
 
+        return userId;
+    }
+    public int getIdUserForEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + COLUMN_ID + " FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        int userId = -1; // Mặc định nếu không tìm thấy
+        if (cursor.moveToFirst()) { // Kiểm tra nếu có dữ liệu
+            userId = cursor.getInt(0); // Lấy ID từ cột đầu tiên
+        }
+        cursor.close(); // Đóng Cursor để tránh rò rỉ bộ nhớ
+        db.close(); // Đóng database
+        return userId;
+    }
     public boolean checkUser(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -218,7 +179,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
-//        db.close();
+        db.close();
 
         Log.d(TAG, "checkUser: Kiểm tra user " + username + " - Kết quả: " + (count > 0));
         return count > 0;
@@ -228,52 +189,149 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT 1 FROM " + TABLE_USER + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
         boolean exists = cursor.getCount() > 0;
         cursor.close();
-//        db.close();
+        db.close();
         return exists;
     }
-    public double getUserBudget(String email) {
+
+    public String getUserFullname(int IdUser) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String fullname = "";
+
+        try {
+            String query = "SELECT " + COLUMN_LASTNAME + ", " + COLUMN_FIRSTNAME +
+                    " FROM " + TABLE_USER +
+                    " WHERE " + COLUMN_ID + " = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(IdUser)});
+
+            if (cursor.moveToFirst()) {
+                String lastName = cursor.getString(0);
+                String firstName = cursor.getString(1);
+                fullname = lastName + " " + firstName;
+            }
+
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+
+        return fullname;
+    }
+    public double getUserBudget(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         double budgetAmount = 0.0;
 
-        Cursor cursor = null;
         try {
-            String query = "SELECT " + COLUMN_BUDGET_AMOUNT +
-                    " FROM " + TABLE_BUDGET +
-                    " WHERE " + COLUMN_ID +
-                    " = (SELECT " + COLUMN_ID +
-                    " FROM " + TABLE_USER +
-                    " WHERE " + COLUMN_EMAIL + " = ?)";
+            String query = "SELECT SUM(" + COLUMN_BUDGET_AMOUNT + ") " +
+                    "FROM " + TABLE_BUDGET +
+                    " WHERE " + COLUMN_ID + " = ?"; // COLUMN_ID là khóa ngoại tham chiếu userId
 
-            cursor = db.rawQuery(query, new String[]{email});
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
-            if (cursor.moveToFirst()) {
+            if (cursor.moveToFirst() && !cursor.isNull(0)) { // Kiểm tra null trước khi lấy giá trị
                 budgetAmount = cursor.getDouble(0);
             }
 
             cursor.close();
-            Log.d(TAG, "getUserBudget: Số tiền budget của " + email + " là " + budgetAmount);
+            Log.d(TAG, "getUserBudget: Tổng budget của User ID " + userId + " là " + budgetAmount);
         } catch (Exception e) {
-            Log.e(TAG, "Lỗi khi lấy budget của user", e);
+            Log.e(TAG, "Lỗi khi lấy tổng budget của user", e);
         } finally {
-            if (cursor != null) cursor.close();
+            db.close();
         }
 
         return budgetAmount;
     }
-    public long addExpense(int userId, double amount, String category, String date) {
+    public List<String[]> getUserBudgets(int userId) {
+        List<String[]> budgetList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_EXPENSE_AMOUNT, amount);
-        contentValues.put(COLUMN_EXPENSE_CATEGORY, category);
-        contentValues.put(COLUMN_EXPENSE_DATE, date);
-        contentValues.put(COLUMN_ID, userId);
-        db.insert(TABLE_EXPENSES, null, contentValues);
+        Cursor cursor = null;
 
-        return userId;
+        try {
+            String query = "SELECT " + COLUMN_BUDGET_AMOUNT + ", " + COLUMN_BUDGET_CATEGORY +
+                    " FROM " + TABLE_BUDGET + " WHERE " + COLUMN_ID + " = ?";
+
+            cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            while (cursor.moveToNext()) {
+                String amount = cursor.getString(0);
+                String category = cursor.getString(1);
+                budgetList.add(new String[]{amount, category});
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+
+        return budgetList;
     }
 
-    public Cursor getLoggedInUser() {
+    public List<Expense> getExpensesForUser(int userId) {
+        List<Expense> expenseList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT email FROM " + TABLE_USER + " LIMIT 1", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_ID + " = ?", new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                int expenseId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_ID));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_AMOUNT));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_CATEGORY));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_DATE));
+
+                expenseList.add(new Expense(expenseId, amount, category, date, userId));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return expenseList;
+    }
+
+    public void deleteExpense(long expenseId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_EXPENSES, COLUMN_EXPENSE_ID + " = ?", new String[]{String.valueOf(expenseId)});
+        db.close();
+    }
+
+    public void updateExpense(Expense expense) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_EXPENSE_AMOUNT, expense.getAmount());
+        values.put(COLUMN_EXPENSE_CATEGORY, expense.getCategory());
+        values.put(COLUMN_EXPENSE_DATE, expense.getDate());
+
+        db.update(TABLE_EXPENSES, values, COLUMN_EXPENSE_ID + " = ?", new String[]{String.valueOf(expense.getExpense_id())});
+        db.close();
+    }
+
+    public List<Expense> getAllExpenses(int userId) {
+        List<Expense> expenses = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_ID + " = ?", new String[]{String.valueOf(userId)});
+
+        Log.d("Database", "Querying expenses for user: " + userId);
+
+        if (cursor.moveToFirst()) {
+            do {
+                int expense_id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_ID));
+                double expense_amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_AMOUNT));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_CATEGORY));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_DATE));
+
+                expenses.add(new Expense(expense_id, expense_amount, category, date, userId));
+
+                Log.d("Database", "Expense Loaded: " + expense_id + " - " + expense_amount + " - " + category);
+            } while (cursor.moveToNext());
+        } else {
+            Log.d("Database", "No expenses found for user: " + userId);
+        }
+
+        cursor.close();
+        db.close();
+        return expenses;
     }
 }

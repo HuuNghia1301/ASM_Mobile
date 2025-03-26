@@ -7,7 +7,7 @@ public class Expense {
     private String category;
     private String date;
 
-    public  Expense(){}
+    public  Expense(int expense_id, double expense_amount, String category, String date, int userId){}
     public Expense(long expense_id, long userId, double amount, String category, String date) {
         this.expense_id = expense_id;
         this.userId = userId;
@@ -15,6 +15,7 @@ public class Expense {
         this.category = category;
         this.date = date;
     }
+
 
     public long getExpense_id() {
         return expense_id;
