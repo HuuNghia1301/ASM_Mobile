@@ -9,6 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.asm_ad.Model.Expense;
 import com.example.asm_ad.Model.User;
 
 import java.util.ArrayList;
@@ -114,9 +115,10 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.e(TAG, "Lỗi khi thêm user  ", e);
         } finally {
-
+            db.endTransaction(); // Kết thúc transaction
             db.close();
         }
+
         return (userId != -1 ) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
     }
     public long addBudget(double amount, String category, long userId){
@@ -285,5 +287,49 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     }
 
 
+    public void deleteExpense(long expenseId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_EXPENSES, COLUMN_EXPENSE_ID + " = ?", new String[]{String.valueOf(expenseId)});
+        db.close();
+    }
 
+    public void updateExpense(Expense expense) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_EXPENSE_AMOUNT, expense.getAmount());
+        values.put(COLUMN_EXPENSE_CATEGORY, expense.getCategory());
+        values.put(COLUMN_EXPENSE_DATE, expense.getDate());
+
+        db.update(TABLE_EXPENSES, values, COLUMN_EXPENSE_ID + " = ?", new String[]{String.valueOf(expense.getExpense_id())});
+        db.close();
+    }
+
+    public List<Expense> getAllExpenses(int userId) {
+        List<Expense> expenses = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_ID + " = ?", new String[]{String.valueOf(userId)});
+
+        Log.d("Database", "Querying expenses for user: " + userId);
+
+        if (cursor.moveToFirst()) {
+            do {
+                int expense_id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_ID));
+                double expense_amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_AMOUNT));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_CATEGORY));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_DATE));
+
+                expenses.add(new Expense(expense_id, expense_amount, category, date, userId));
+
+                Log.d("Database", "Expense Loaded: " + expense_id + " - " + expense_amount + " - " + category);
+            } while (cursor.moveToNext());
+        } else {
+            Log.d("Database", "No expenses found for user: " + userId);
+        }
+
+        cursor.close();
+        db.close();
+
+        return expenses;
+    }
 }

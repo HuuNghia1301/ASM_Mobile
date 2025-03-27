@@ -2,9 +2,11 @@ package com.example.asm_ad;
 
 import static java.security.AccessController.getContext;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -20,7 +22,7 @@ public class Home extends AppCompatActivity {
     private BottomNavigationView mNavigationView;
     private ViewPager2 mViewPager;
     private ViewPagerAdapter viewPagerAdapter;
-
+    private Button btnBudget;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +34,7 @@ public class Home extends AppCompatActivity {
 
         // Thiết lập ViewPager2
         setUpViewPager();
+
 
         // Xử lý khi chọn menu trong BottomNavigationView
         mNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {

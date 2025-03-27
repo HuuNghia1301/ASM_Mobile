@@ -4,7 +4,6 @@ package com.example.asm_ad;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -15,8 +14,6 @@ import com.example.asm_ad.Model.Budget;
 import java.util.List;
 public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetViewHolder> {
     private List<Budget> budgetList;
-
-    private AdapterView.OnItemClickListener Listener;
 
     public BudgetAdapter(List<Budget> budgetList) {
         this.budgetList = budgetList;
@@ -44,7 +41,7 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Budget budget);
+        void onItemClick (Budget budget);
     }
 
     public static class BudgetViewHolder extends RecyclerView.ViewHolder {

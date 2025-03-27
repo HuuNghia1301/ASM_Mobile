@@ -41,12 +41,13 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         btnBack = findViewById(R.id.btnBack);
         btnDeleteBudget = findViewById(R.id.btnDeleteBudget);
         btnUpdateBudget = findViewById(R.id.btnUpdateBudget);
+
         // Khởi tạo SQLite Database Helper
         dbHelper = new DataBaseUserHelper(this);
-
         // Khởi tạo danh sách ngân sách
+
         budgetList = new ArrayList<>();
-        budgetAdapter = new BudgetAdapter(budgetList, this); // Truyền this để lắng nghe sự kiện click
+        budgetAdapter = new BudgetAdapter(budgetList,this);
         showViewBudget();
 
         // Thiết lập RecyclerView
@@ -79,7 +80,6 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         String category = edtBudgetCategory.getText().toString().trim();
         String amountStr = edtBudgetAmount.getText().toString().trim();
         double amount;
-
         try {
             amount = Double.parseDouble(amountStr);
         } catch (NumberFormatException e) {
@@ -106,9 +106,13 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
 
+        // Lấy danh sách ngân sách từ SQLite
         List<String[]> budgets = dbHelper.getUserBudgets(userId);
+
+        // Xóa danh sách cũ để cập nhật mới
         budgetList.clear();
 
+        // Duyệt danh sách và thêm vào budgetList
         for (String[] budget : budgets) {
             String category = budget[1];
             double amount = Double.parseDouble(budget[0]);
