@@ -1,5 +1,6 @@
 package com.example.asm_ad;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -17,10 +18,11 @@ import com.example.asm_ad.Model.User;
 public class Register extends AppCompatActivity {
 
     private EditText editEmail, editPassword, editFirstName, editLastName;
-    private Button btnSign;
+    private Button btnSign,btnBack;
     private TextView txtthongbao;
     private DataBaseUserHelper dbHelper;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,8 +37,9 @@ public class Register extends AppCompatActivity {
         editLastName = findViewById(R.id.editLastName);
         btnSign = findViewById(R.id.btnSign);
         txtthongbao = findViewById(R.id.txtthongbao);
-
+        btnBack = findViewById(R.id.btnBack);
         btnSign.setOnClickListener(v -> userRegister());
+        btnBack.setOnClickListener(v -> navigateToLogin());
     }
 
     private void userRegister() {
@@ -60,7 +63,7 @@ public class Register extends AppCompatActivity {
         // Tạo đối tượng User mới
        User newUser = new User(mail, password, firstName, lastName);
        double tien = 0;
-       long id = dbHelper.addUser(newUser,tien,"TOTAl");
+       long id = dbHelper.addUser(newUser);
 
         if (id != -1) {
             txtthongbao.setText("Đăng ký thành công");

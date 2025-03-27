@@ -4,6 +4,7 @@ package com.example.asm_ad;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,11 +26,13 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
         return new BudgetViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull BudgetViewHolder holder, int position) {
         Budget budget = budgetList.get(position);
         holder.txtCategory.setText(budget.getCategory());
         holder.txtAmount.setText(String.valueOf(budget.getAmount()));
+
     }
 
     @Override
@@ -40,10 +43,12 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
     public static class BudgetViewHolder extends RecyclerView.ViewHolder {
         TextView txtCategory, txtAmount;
 
+
         public BudgetViewHolder(@NonNull View itemView) {
             super(itemView);
             txtCategory = itemView.findViewById(R.id.txtCategory);
             txtAmount = itemView.findViewById(R.id.txtAmount);
         }
+
     }
 }
