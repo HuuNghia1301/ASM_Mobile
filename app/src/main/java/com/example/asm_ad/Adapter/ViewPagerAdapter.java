@@ -1,12 +1,13 @@
-package com.example.asm_ad;
+package com.example.asm_ad.Adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
+
+import com.example.asm_ad.Frafment.ExpenseFrafment;
+import com.example.asm_ad.Frafment.HomeFrafment;
+import com.example.asm_ad.Frafment.SetingFrafment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
 

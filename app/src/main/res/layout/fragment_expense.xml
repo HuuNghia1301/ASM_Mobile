@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/editEpense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -14,15 +15,6 @@
         android:text="Expense"
         android:textColor="@color/black"
         android:textSize="45sp" />
-
-    <ProgressBar
-        android:id="@+id/progressBarBudget"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_marginTop="16dp"
-        android:max="100"
-
-        android:progress="0" />
 
     <TextView
         android:id="@+id/textBudgetStatus"
@@ -34,13 +26,14 @@
         android:textSize="20sp" />
 
     <EditText
+
         android:id="@+id/editTextAmount"
         android:layout_width="match_parent"
         android:layout_height="60sp"
         android:layout_marginTop="10sp"
         android:ems="10"
         android:hint="Amount"
-        android:inputType="text"
+        android:inputType="numberDecimal"
         android:minHeight="48dp"
         android:textColorHint="#000000"
         tools:ignore="DuplicateClickableBoundsCheck" />
@@ -72,6 +65,14 @@
         android:layout_width="291dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Button" />
+        android:text="ADD" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvExpense"
+        android:layout_width="match_parent"
+        android:layout_height="376dp"
+        android:layout_marginTop="8dp"
+        android:nestedScrollingEnabled="false"
+        android:padding="10dp" />
 
 </LinearLayout>

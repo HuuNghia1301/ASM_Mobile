@@ -1,26 +1,23 @@
+package com.example.asm_ad.Frafment;
 
-package com.example.asm_ad;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.asm_ad.BudgetActivity;
 import com.example.asm_ad.Database.DataBaseUserHelper;
-import com.example.asm_ad.Model.Expense;
-
-import java.util.List;
+import com.example.asm_ad.R;
 
 
 public class HomeFrafment extends Fragment {
@@ -28,16 +25,17 @@ public class HomeFrafment extends Fragment {
     private TextView user;
     private DataBaseUserHelper dbHelper;
     private SharedPreferences sharedPreferences;
-    private RecyclerView recyclerView;
-    private ExpenseAdapter expenseAdapter;
-    private List<Expense> expenseList;
+
     private Button btnaddBudget;
-    private int userId;
+
     private TextView txtBudget;
 
+    private int userId;
+    private ProgressBar progressBar;
+    private TextView txtExpensePercentage;
 
 
-
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,38 +43,25 @@ public class HomeFrafment extends Fragment {
 
         user = view.findViewById(R.id.user);
         txtBudget = view.findViewById(R.id.txtBudget); // Cần khai báo trong XML
-
+        progressBar = view.findViewById(R.id.thismothBudget);
+        txtExpensePercentage = view.findViewById(R.id.txtExpensePercentage);
         btnaddBudget = view.findViewById(R.id.addBudget);
 
         // Khởi tạo database helper
 
-        dbHelper = new DataBaseUserHelper(getContext());
-        List<Expense> expenseList = dbHelper.getAllExpenses(userId);
-        expenseAdapter = new ExpenseAdapter(getContext(), expenseList);
-        btnaddBudget.setOnClickListener(v -> showAddBudget());
-        recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(expenseAdapter);
-        dbHelper.getAllExpenses(userId);
-        dbHelper = new DataBaseUserHelper(getActivity());
-        loadExpenses();
-        getUserName();
-        showBudget();
-        return view;
-    }
-    public void loadExpenses() {
-        expenseList = dbHelper.getAllExpenses(userId);
-        if (expenseAdapter != null) {
-            expenseAdapter.updateList(expenseList);
-            expenseAdapter.notifyDataSetChanged();
-        } else {
-            Log.e("HomeFragment", "expenseAdapter is null");
-        }
-    }
+        dbHelper = new DataBaseUserHelper(requireContext());
 
-    public void getUserName() {
+        btnaddBudget.setOnClickListener(v -> showAddBudget());
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
+        this.userId = userId;
+
+        getUserName();
+        showBudget();
+        showBudget1();
+        return view;
+    }
+    public void getUserName() {
         dbHelper.getUserFullname(userId);
         user.setText("Welcome :" + dbHelper.getUserFullname(userId));
     }
@@ -85,12 +70,26 @@ public class HomeFrafment extends Fragment {
         startActivity(intent);
     }
     public void showBudget() {
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", requireContext().MODE_PRIVATE);
-        int userId = sharedPreferences.getInt("userId", -1);
-
+        double expense = dbHelper.getUseExpense(userId); // Lấy tổng số tiền chi tiêu
         double budget = dbHelper.getUserBudget(userId); // Lấy tổng số tiền budget
-        String budgetText = String.valueOf(budget); // Chuyển từ double sang String
+        String budgetText = String.valueOf(budget-expense); // Chuyển từ double sang String
 
         txtBudget.setText("Budget $ "+ budgetText); // Gán vào TextView
     }
+    public void showBudget1() {
+        double expense = dbHelper.getUseExpense(userId);
+        double budget = dbHelper.getUserBudget(userId);
+
+        int percent = (budget > 0) ? (int) ((expense / budget) * 100) : 0;
+
+        txtExpensePercentage.setText("Expense this month: " + percent + "%");
+        progressBar.setProgress(percent);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        showBudget();
+        showBudget1();
+    }
+
 }

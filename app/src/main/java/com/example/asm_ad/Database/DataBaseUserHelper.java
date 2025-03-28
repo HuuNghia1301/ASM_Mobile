@@ -95,7 +95,6 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         long userId = -1;
 
-
         try {
             // Thêm user vào bảng users
             ContentValues userValues = new ContentValues();
@@ -115,10 +114,9 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.e(TAG, "Lỗi khi thêm user  ", e);
         } finally {
-            db.endTransaction(); // Kết thúc transaction
+
             db.close();
         }
-
         return (userId != -1 ) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
     }
     public long addBudget(double amount, String category, long userId){
@@ -198,6 +196,17 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
+    public boolean isBudgetExpense(String category, int userId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_EXPENSE_CATEGORY + " = ? AND " + COLUMN_ID + " = ?",
+                new String[]{category, String.valueOf(userId)}
+        );
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
     public boolean deleteBudgetByCategory(String category, int userID) {
         SQLiteDatabase db = this.getWritableDatabase();
         int rowsDeleted = db.delete(
@@ -208,8 +217,16 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.close();
         return rowsDeleted > 0; // Trả về true nếu xóa thành công, ngược lại false
     }
-
-
+    public boolean deleteExpenseByCategory(String category, int userID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rowsDeleted = db.delete(
+                TABLE_EXPENSES,
+                COLUMN_EXPENSE_CATEGORY + " = ? AND " + COLUMN_ID + " = ?",
+                new String[]{category, String.valueOf(userID)}
+        );
+        db.close();
+        return rowsDeleted > 0;
+    }
     public String getUserFullname(int IdUser) {
         SQLiteDatabase db = this.getReadableDatabase();
         String fullname = "";
@@ -260,6 +277,27 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetAmount;
     }
+    public double getUseExpense(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double expenseAmount = 0.0;
+        try{
+            String query = "SELECT SUM(" + COLUMN_EXPENSE_AMOUNT + ") " +
+                    "FROM " + TABLE_EXPENSES +
+                    " WHERE " + COLUMN_ID + " = ?"; //
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+            if (cursor.moveToFirst() && !cursor.isNull(0)) {
+                expenseAmount = cursor.getDouble(0);
+            }
+            cursor.close();
+        }
+        catch (Exception e){
+            Log.e(TAG, "Lỗi khi lấy tổng chi tiêu của user", e);
+        }
+        finally {
+            db.close();
+        }
+        return  expenseAmount ;
+    }
     public List<String[]> getUserBudgets(int userId) {
         List<String[]> budgetList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -285,51 +323,28 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetList;
     }
-
-
-    public void deleteExpense(long expenseId) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_EXPENSES, COLUMN_EXPENSE_ID + " = ?", new String[]{String.valueOf(expenseId)});
-        db.close();
-    }
-
-    public void updateExpense(Expense expense) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(COLUMN_EXPENSE_AMOUNT, expense.getAmount());
-        values.put(COLUMN_EXPENSE_CATEGORY, expense.getCategory());
-        values.put(COLUMN_EXPENSE_DATE, expense.getDate());
-
-        db.update(TABLE_EXPENSES, values, COLUMN_EXPENSE_ID + " = ?", new String[]{String.valueOf(expense.getExpense_id())});
-        db.close();
-    }
-
-    public List<Expense> getAllExpenses(int userId) {
-        List<Expense> expenses = new ArrayList<>();
+    public List<String[]> getUserExpense(int userId) {
+        List<String[]> expensesList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_ID + " = ?", new String[]{String.valueOf(userId)});
+        Cursor cursor = null;
+        try {
+            String query = "SELECT " + COLUMN_EXPENSE_AMOUNT + ", " + COLUMN_EXPENSE_CATEGORY + "," + COLUMN_EXPENSE_DATE +
+                    " FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_ID + " = ?";
 
-        Log.d("Database", "Querying expenses for user: " + userId);
-
-        if (cursor.moveToFirst()) {
-            do {
-                int expense_id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_ID));
-                double expense_amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_AMOUNT));
-                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_CATEGORY));
-                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_DATE));
-
-                expenses.add(new Expense(expense_id, expense_amount, category, date, userId));
-
-                Log.d("Database", "Expense Loaded: " + expense_id + " - " + expense_amount + " - " + category);
-            } while (cursor.moveToNext());
-        } else {
-            Log.d("Database", "No expenses found for user: " + userId);
+            cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+            while (cursor.moveToNext()) {
+                String amount = cursor.getString(0);
+                String category = cursor.getString(1);
+                String date = cursor.getString(2);
+                expensesList.add(new String[]{amount, category, date});
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
         }
-
-        cursor.close();
-        db.close();
-
-        return expenses;
+        return expensesList;
     }
+
 }

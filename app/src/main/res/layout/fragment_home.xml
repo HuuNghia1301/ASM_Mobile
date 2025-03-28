@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     android:background="@color/white"
     android:orientation="vertical">
 
@@ -40,14 +41,80 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="334dp"
+        android:layout_height="match_parent"
         android:gravity="bottom|center"
         android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="309dp"
-            android:layout_height="243dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <!-- Cột 1 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/thismothBudget"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="150dp"
+                    android:layout_height="80dp"
+                    android:background="#FFFFFF"
+                    android:backgroundTint="#FDFBFB"
+                    android:indeterminateTint="#070101"
+                    android:indeterminateTintMode="add"
+                    android:scaleY="5" />
+
+                <TextView
+                    android:id="@+id/txtExpensePercentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Expense: 0%"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <!-- Cột 2 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/thismothBudget2"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="150dp"
+                    android:layout_height="80dp"
+                    android:background="#FFFFFF"
+                    android:backgroundTint="#FDFBFB"
+                    android:indeterminateTint="#070101"
+                    android:indeterminateTintMode="add"
+                    android:scaleY="5" />
+
+                <TextView
+                    android:id="@+id/txtExpensePercentage3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Expense: 0%"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/addBudget"
@@ -67,5 +134,11 @@
             tools:ignore="MissingConstraints" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnBudget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button" />
 
 </LinearLayout>

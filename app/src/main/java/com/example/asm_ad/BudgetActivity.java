@@ -19,6 +19,8 @@ import com.example.asm_ad.Database.DataBaseUserHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.asm_ad.Adapter.BudgetAdapter;
+
 public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.OnItemClickListener {
     private EditText edtBudgetAmount, edtBudgetCategory;
     private Button btnSaveBudget, btnBack,btnDeleteBudget,btnUpdateBudget;
@@ -26,6 +28,7 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
     private BudgetAdapter budgetAdapter;
     private List<Budget> budgetList;
     private DataBaseUserHelper dbHelper;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -37,17 +40,15 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         edtBudgetAmount = findViewById(R.id.edtBudgetAmount);
         edtBudgetCategory = findViewById(R.id.edtBudgetCategory);
         btnSaveBudget = findViewById(R.id.btnSaveBudget);
-        rvBudgets = findViewById(R.id.rvBudgets);
+        rvBudgets = findViewById(R.id.rvExpense);
         btnBack = findViewById(R.id.btnBack);
         btnDeleteBudget = findViewById(R.id.btnDeleteBudget);
         btnUpdateBudget = findViewById(R.id.btnUpdateBudget);
-
         // Khởi tạo SQLite Database Helper
         dbHelper = new DataBaseUserHelper(this);
         // Khởi tạo danh sách ngân sách
-
         budgetList = new ArrayList<>();
-        budgetAdapter = new BudgetAdapter(budgetList,this);
+        budgetAdapter = new BudgetAdapter(budgetList, this); // Truyền `this` để lắng nghe sự kiện click
         showViewBudget();
 
         // Thiết lập RecyclerView
@@ -65,8 +66,6 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         btnUpdateBudget.setOnClickListener(v -> {
             update();
         });
-
-
     }
     @Override
     public void onItemClick(Budget budget) {
@@ -106,13 +105,9 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
 
-        // Lấy danh sách ngân sách từ SQLite
         List<String[]> budgets = dbHelper.getUserBudgets(userId);
-
-        // Xóa danh sách cũ để cập nhật mới
         budgetList.clear();
 
-        // Duyệt danh sách và thêm vào budgetList
         for (String[] budget : budgets) {
             String category = budget[1];
             double amount = Double.parseDouble(budget[0]);
@@ -153,4 +148,5 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         deleteBudget();
         saveBudget();
     }
+
 }

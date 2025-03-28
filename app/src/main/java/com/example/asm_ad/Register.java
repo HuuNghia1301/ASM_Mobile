@@ -18,7 +18,7 @@ import com.example.asm_ad.Model.User;
 public class Register extends AppCompatActivity {
 
     private EditText editEmail, editPassword, editFirstName, editLastName;
-    private Button btnSign,btnBack;
+    private Button btnSign,btnback;
     private TextView txtthongbao;
     private DataBaseUserHelper dbHelper;
 
@@ -37,9 +37,11 @@ public class Register extends AppCompatActivity {
         editLastName = findViewById(R.id.editLastName);
         btnSign = findViewById(R.id.btnSign);
         txtthongbao = findViewById(R.id.txtthongbao);
-        btnBack = findViewById(R.id.btnBack);
+        btnback = findViewById(R.id.btnback);
         btnSign.setOnClickListener(v -> userRegister());
-        btnBack.setOnClickListener(v -> navigateToLogin());
+        btnback.setOnClickListener(v -> navigateToLogin(
+
+        ));
     }
 
     private void userRegister() {
@@ -54,16 +56,15 @@ public class Register extends AppCompatActivity {
             return;
         }
 
-       // Kiểm tra xem tài khoản đã tồn tại chưa
-       if (dbHelper.isEmailExists(mail)) {
-           txtthongbao.setText("Tài khoản đã tồn tại");
+        // Kiểm tra xem tài khoản đã tồn tại chưa
+        if (dbHelper.isEmailExists(mail)) {
+            txtthongbao.setText("Tài khoản đã tồn tại");
             txtthongbao.setVisibility(View.VISIBLE);
             return;
         }
         // Tạo đối tượng User mới
-       User newUser = new User(mail, password, firstName, lastName);
-       double tien = 0;
-       long id = dbHelper.addUser(newUser);
+        User newUser = new User(mail, password, firstName, lastName);
+        long id = dbHelper.addUser(newUser);
 
         if (id != -1) {
             txtthongbao.setText("Đăng ký thành công");

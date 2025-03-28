@@ -7,7 +7,7 @@ public class Expense {
     private String category;
     private String date;
 
-    public  Expense(int expense_id, double expense_amount, String category, String date, int userId){}
+    public  Expense(){}
     public Expense(long expense_id, long userId, double amount, String category, String date) {
         this.expense_id = expense_id;
         this.userId = userId;
@@ -15,7 +15,18 @@ public class Expense {
         this.category = category;
         this.date = date;
     }
+    public Expense(long userId, double amount, String category, String date) {
+        this.userId = userId;
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+    }
 
+    public Expense(double amount, String category, String date) {
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+    }
 
     public long getExpense_id() {
         return expense_id;
@@ -56,5 +67,3 @@ public class Expense {
         this.date = date;
     }
 }
-
-
