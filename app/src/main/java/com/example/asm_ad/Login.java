@@ -1,5 +1,6 @@
 package com.example.asm_ad;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
+
 
         // Khởi tạo SQLite Database Helper
         dbHelper = new DataBaseUserHelper(this);
