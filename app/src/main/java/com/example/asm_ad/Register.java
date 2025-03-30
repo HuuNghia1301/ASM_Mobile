@@ -56,15 +56,15 @@ public class Register extends AppCompatActivity {
             return;
         }
 
-       // Kiểm tra xem tài khoản đã tồn tại chưa
-       if (dbHelper.isEmailExists(mail)) {
-           txtthongbao.setText("Tài khoản đã tồn tại");
+        // Kiểm tra xem tài khoản đã tồn tại chưa
+        if (dbHelper.isEmailExists(mail)) {
+            txtthongbao.setText("Tài khoản đã tồn tại");
             txtthongbao.setVisibility(View.VISIBLE);
             return;
         }
         // Tạo đối tượng User mới
-       User newUser = new User(mail, password, firstName, lastName);
-       long id = dbHelper.addUser(newUser);
+        User newUser = new User(mail, password, firstName, lastName);
+        long id = dbHelper.addUser(newUser);
 
         if (id != -1) {
             txtthongbao.setText("Đăng ký thành công");

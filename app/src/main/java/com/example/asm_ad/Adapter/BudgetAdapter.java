@@ -1,4 +1,4 @@
-package com.example.asm_ad;
+package com.example.asm_ad.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.asm_ad.Model.Budget;
+import com.example.asm_ad.R;
 
 import java.util.List;
 
@@ -39,7 +40,6 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
         Budget budget = budgetList.get(position);
         holder.txtCategory.setText(budget.getCategory());
         holder.txtAmount.setText(String.valueOf(budget.getAmount()));
-
         // Bắt sự kiện click vào item
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

@@ -22,6 +22,12 @@ public class Expense {
         this.date = date;
     }
 
+    public Expense(double amount, String category, String date) {
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+    }
+
     public long getExpense_id() {
         return expense_id;
     }
@@ -61,5 +67,3 @@ public class Expense {
         this.date = date;
     }
 }
-
-

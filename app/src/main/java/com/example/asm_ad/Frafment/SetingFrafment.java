@@ -1,4 +1,4 @@
-package com.example.asm_ad;
+package com.example.asm_ad.Frafment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +11,9 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.example.asm_ad.Login;
+import com.example.asm_ad.R;
 
 public class SetingFrafment extends Fragment {
     private Button btnLogout;
@@ -26,7 +29,7 @@ public class SetingFrafment extends Fragment {
         btnLogout.setOnClickListener(v -> {
             Logout();
             // Chuyển về màn hình đăng nhập sau khi đăng xuất
-            Intent intent = new Intent(getActivity(),Login.class);
+            Intent intent = new Intent(getActivity(), Login.class);
             startActivity(intent);
         });
 

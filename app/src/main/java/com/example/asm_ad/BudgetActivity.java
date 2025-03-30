@@ -19,6 +19,8 @@ import com.example.asm_ad.Database.DataBaseUserHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.asm_ad.Adapter.BudgetAdapter;
+
 public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.OnItemClickListener {
     private EditText edtBudgetAmount, edtBudgetCategory;
     private Button btnSaveBudget, btnBack,btnDeleteBudget,btnUpdateBudget;
@@ -26,6 +28,7 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
     private BudgetAdapter budgetAdapter;
     private List<Budget> budgetList;
     private DataBaseUserHelper dbHelper;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -37,13 +40,12 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         edtBudgetAmount = findViewById(R.id.edtBudgetAmount);
         edtBudgetCategory = findViewById(R.id.edtBudgetCategory);
         btnSaveBudget = findViewById(R.id.btnSaveBudget);
-        rvBudgets = findViewById(R.id.rvBudgets);
+        rvBudgets = findViewById(R.id.rvExpense);
         btnBack = findViewById(R.id.btnBack);
         btnDeleteBudget = findViewById(R.id.btnDeleteBudget);
         btnUpdateBudget = findViewById(R.id.btnUpdateBudget);
         // Khởi tạo SQLite Database Helper
         dbHelper = new DataBaseUserHelper(this);
-
         // Khởi tạo danh sách ngân sách
         budgetList = new ArrayList<>();
         budgetAdapter = new BudgetAdapter(budgetList, this); // Truyền `this` để lắng nghe sự kiện click
@@ -64,8 +66,6 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         btnUpdateBudget.setOnClickListener(v -> {
             update();
         });
-
-
     }
     @Override
     public void onItemClick(Budget budget) {
@@ -79,7 +79,6 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         String category = edtBudgetCategory.getText().toString().trim();
         String amountStr = edtBudgetAmount.getText().toString().trim();
         double amount;
-
         try {
             amount = Double.parseDouble(amountStr);
         } catch (NumberFormatException e) {
@@ -149,4 +148,5 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         deleteBudget();
         saveBudget();
     }
+
 }

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.asm_ad.Model.Expense;
 import com.example.asm_ad.Model.User;
 
 import java.util.ArrayList;
@@ -93,7 +94,6 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         long userId = -1;
-
 
         try {
             // Thêm user vào bảng users
@@ -196,6 +196,17 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
+    public boolean isBudgetExpense(String category, int userId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_EXPENSE_CATEGORY + " = ? AND " + COLUMN_ID + " = ?",
+                new String[]{category, String.valueOf(userId)}
+        );
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
     public boolean deleteBudgetByCategory(String category, int userID) {
         SQLiteDatabase db = this.getWritableDatabase();
         int rowsDeleted = db.delete(
@@ -206,8 +217,16 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.close();
         return rowsDeleted > 0; // Trả về true nếu xóa thành công, ngược lại false
     }
-
-
+    public boolean deleteExpenseByCategory(String category, int userID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rowsDeleted = db.delete(
+                TABLE_EXPENSES,
+                COLUMN_EXPENSE_CATEGORY + " = ? AND " + COLUMN_ID + " = ?",
+                new String[]{category, String.valueOf(userID)}
+        );
+        db.close();
+        return rowsDeleted > 0;
+    }
     public String getUserFullname(int IdUser) {
         SQLiteDatabase db = this.getReadableDatabase();
         String fullname = "";
@@ -258,6 +277,27 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetAmount;
     }
+    public double getUseExpense(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double expenseAmount = 0.0;
+        try{
+            String query = "SELECT SUM(" + COLUMN_EXPENSE_AMOUNT + ") " +
+                    "FROM " + TABLE_EXPENSES +
+                    " WHERE " + COLUMN_ID + " = ?"; //
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+            if (cursor.moveToFirst() && !cursor.isNull(0)) {
+                expenseAmount = cursor.getDouble(0);
+            }
+            cursor.close();
+        }
+        catch (Exception e){
+            Log.e(TAG, "Lỗi khi lấy tổng chi tiêu của user", e);
+        }
+        finally {
+            db.close();
+        }
+        return  expenseAmount ;
+    }
     public List<String[]> getUserBudgets(int userId) {
         List<String[]> budgetList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -283,7 +323,28 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetList;
     }
+    public List<String[]> getUserExpense(int userId) {
+        List<String[]> expensesList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT " + COLUMN_EXPENSE_AMOUNT + ", " + COLUMN_EXPENSE_CATEGORY + "," + COLUMN_EXPENSE_DATE +
+                    " FROM " + TABLE_EXPENSES + " WHERE " + COLUMN_ID + " = ?";
 
-
+            cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+            while (cursor.moveToNext()) {
+                String amount = cursor.getString(0);
+                String category = cursor.getString(1);
+                String date = cursor.getString(2);
+                expensesList.add(new String[]{amount, category, date});
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+        return expensesList;
+    }
 
 }
