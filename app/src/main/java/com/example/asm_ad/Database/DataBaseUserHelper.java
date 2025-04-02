@@ -9,7 +9,6 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.asm_ad.Model.Expense;
 import com.example.asm_ad.Model.User;
 
 import java.util.ArrayList;
@@ -227,6 +226,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.close();
         return rowsDeleted > 0;
     }
+
     public String getUserFullname(int IdUser) {
         SQLiteDatabase db = this.getReadableDatabase();
         String fullname = "";
@@ -346,5 +346,19 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         }
         return expensesList;
     }
+    public boolean updateExpense(int userId, String oldCategory, double amount, String category, String newDate) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
 
+        contentValues.put(COLUMN_EXPENSE_AMOUNT, amount);
+        contentValues.put(COLUMN_EXPENSE_CATEGORY, category);
+        contentValues.put(COLUMN_EXPENSE_DATE, newDate);
+
+        int rowsUpdated = db.update(TABLE_EXPENSES, contentValues,
+                COLUMN_ID + " = ? AND " + COLUMN_EXPENSE_CATEGORY + " = ?",
+                new String[]{String.valueOf(userId), oldCategory});
+
+        db.close();
+        return rowsUpdated > 0;
+    }
 }
