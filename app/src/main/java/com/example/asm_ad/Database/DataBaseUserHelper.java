@@ -44,6 +44,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
     private static final String COLUMN_BUDGET_AMOUNT = "amount";
     private static final String COLUMN_BUDGET_CATEGORY = "category";
 
+    private static final String COLUMN_BUDGET_DATE = "date";
 
     public DataBaseUserHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -72,16 +73,14 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY (" + COLUMN_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_ID + ") ON DELETE CASCADE ON UPDATE CASCADE);";
         db.execSQL(createTableExpenses);
 
-        // Tạo bảng Budget
         String createTableBudget = "CREATE TABLE " + TABLE_BUDGET + " (" +
                 COLUMN_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_BUDGET_AMOUNT + " REAL NOT NULL, " +
                 COLUMN_BUDGET_CATEGORY + " TEXT NOT NULL, " +
+                COLUMN_BUDGET_DATE + " TEXT NOT NULL, " + // Thêm cột date
                 COLUMN_ID + " INTEGER, " +
                 "FOREIGN KEY (" + COLUMN_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_ID + ") ON DELETE CASCADE ON UPDATE CASCADE);";
         db.execSQL(createTableBudget);
-
-        Log.d(TAG, "Database tables created successfully.");
     }
 
     @Override
@@ -118,12 +117,13 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         }
         return (userId != -1 ) ? userId : -1; // Trả về userId nếu thành công, ngược lại -1
     }
-    public long addBudget(double amount, String category, long userId){
+    public long addBudget(double amount, String category, long userId, String date){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_BUDGET_AMOUNT, amount);
         contentValues.put(COLUMN_BUDGET_CATEGORY, category);
         contentValues.put(COLUMN_ID, userId);
+        contentValues.put(COLUMN_BUDGET_DATE,date);
         db.insert(TABLE_BUDGET, null, contentValues);
         db.close();
         return userId;

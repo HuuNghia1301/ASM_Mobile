@@ -15,9 +15,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.asm_ad.Model.Budget;
 import com.example.asm_ad.Database.DataBaseUserHelper;
-
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+
+
 
 import com.example.asm_ad.Adapter.BudgetAdapter;
 
@@ -28,6 +37,8 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
     private BudgetAdapter budgetAdapter;
     private List<Budget> budgetList;
     private DataBaseUserHelper dbHelper;
+    // Khởi tạo đối tượng SimpleDateFormat với định dạng bạn mong muốn
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -74,6 +85,10 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         edtBudgetAmount.setText(String.valueOf(budget.getAmount()));
     }
     public void saveBudget() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        // Lấy thời gian thực
+        String currentDate = sdf.format(new Date());
+
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
         String category = edtBudgetCategory.getText().toString().trim();
@@ -89,7 +104,7 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
             Toast.makeText(this, "Danh mục ngân sách đã tồn tại!", Toast.LENGTH_SHORT).show();
             return;
         }
-        long insertedId = dbHelper.addBudget(amount, category, userId);
+        long insertedId = dbHelper.addBudget(amount, category, userId,currentDate);
         if (insertedId != -1) {
             Toast.makeText(this, "Ngân sách đã được lưu!", Toast.LENGTH_SHORT).show();
             showViewBudget();
