@@ -21,6 +21,8 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     public interface OnExpenseClickListener {
         void onItemClick(Expense expense); // Trả về expense khi click
+
+        void onDeleteClick(Expense expense); // Click để xóa
     }
 
     public ExpenseAdapter(List<Expense> expenseList, OnExpenseClickListener listener) {
@@ -36,21 +38,28 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
     @Override
     public void onBindViewHolder(@NonNull ExpenseViewHolder holder, int position) {
         Expense expense = expenseList.get(position);
-        if (expense == null){
-            return;
-        }
+        if (expense == null) return;
+
         holder.txtCategory.setText(expense.getCategory());
         holder.txtAmount.setText("$" + expense.getAmount());
         holder.txtDate.setText(expense.getDate());
-        holder.btnDeleteExpense.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.onItemClick(expense ); // Gửi expense khi click);
-                }
+
+        // Nhấn vào item để chỉnh sửa
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(expense); // Gửi expense để chỉnh sửa
             }
         });
+
+        // Nhấn nút Xóa
+        holder.btnDeleteExpense.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteClick(expense); // Gửi expense để xóa
+            }
+        });
+
     }
+
 
     @Override
     public int getItemCount() {
@@ -67,5 +76,6 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             txtDate = itemView.findViewById(R.id.txtDate);
             btnDeleteExpense = itemView.findViewById(R.id.btnDeleteExpense);
         }
+
     }
 }

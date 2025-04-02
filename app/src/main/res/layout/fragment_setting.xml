@@ -11,22 +11,7 @@
         android:layout_width="261dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="20sp"
+        android:layout_margin="100sp"
         android:text="LOGOUT" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="20sp"
-        android:text="Button" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="253dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="20sp"
-        android:text="Button" />
 </LinearLayout>

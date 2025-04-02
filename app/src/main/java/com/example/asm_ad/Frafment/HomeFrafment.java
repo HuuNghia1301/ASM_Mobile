@@ -31,8 +31,8 @@ public class HomeFrafment extends Fragment {
     private TextView txtBudget;
 
     private int userId;
-    private ProgressBar progressBar;
-    private TextView txtExpensePercentage;
+    private ProgressBar progressBar1,progressBar2;
+    private TextView txtExpensePercentage ,txtExpense;
 
 
     @SuppressLint("MissingInflatedId")
@@ -43,10 +43,11 @@ public class HomeFrafment extends Fragment {
 
         user = view.findViewById(R.id.user);
         txtBudget = view.findViewById(R.id.txtBudget); // Cần khai báo trong XML
-        progressBar = view.findViewById(R.id.thismothBudget);
+        progressBar1 = view.findViewById(R.id.Budget);
         txtExpensePercentage = view.findViewById(R.id.txtExpensePercentage);
         btnaddBudget = view.findViewById(R.id.addBudget);
-
+        progressBar2 = view.findViewById(R.id.Expense);
+        txtExpense = view.findViewById(R.id.txtExpense);
         // Khởi tạo database helper
 
         dbHelper = new DataBaseUserHelper(requireContext());
@@ -77,14 +78,28 @@ public class HomeFrafment extends Fragment {
         txtBudget.setText("Budget $ "+ budgetText); // Gán vào TextView
     }
     public void showBudget1() {
-        double expense = dbHelper.getUseExpense(userId);
-        double budget = dbHelper.getUserBudget(userId);
+        double expenseThisMonth = dbHelper.getUseExpense(userId); // Tổng chi tiêu tháng này
+        double budgetThisMonth = dbHelper.getUserBudget(userId);  // Ngân sách tháng này
 
-        int percent = (budget > 0) ? (int) ((expense / budget) * 100) : 0;
+        double expenseLastMonth = dbHelper.getUserExpenseLastMonth(userId); // Tổng chi tiêu tháng trước
+        double budgetLastMonth = dbHelper.getUserBudgetLastMonth(userId);  // Ngân sách tháng trước
+//        double remainingAmount = budgetThisMonth - expenseThisMonth; // Tính số tiền còn lại
+//        double remainingAmountLast = budgetLastMonth - expenseLastMonth ;
+        // Hiển thị số tiền còn lại
+        txtExpensePercentage.setText("Ngân sách tháng này: " + budgetThisMonth + " | Chi tiêu: " + expenseThisMonth);
+        txtExpense.setText("Ngân sách tháng trước: " + budgetLastMonth + " | Chi tiêu: " + expenseLastMonth);
 
-        txtExpensePercentage.setText("Expense this month: " + percent + "%");
-        progressBar.setProgress(percent);
+
+        // Cập nhật progressBar1 (Thể hiện số tiền còn lại)
+        progressBar1.setMax((int) budgetThisMonth);  // Ngân sách là giá trị tối đa
+        progressBar1.setProgress((int) expenseThisMonth); // Hiển thị tổng chi tiêu
+
+        // Cập nhật progressBar2 (Thể hiện số tiền đã chi tiêu)
+        progressBar2.setMax((int) budgetLastMonth);  // Ngân sách là giá trị tối đa
+        progressBar2.setProgress((int) expenseLastMonth); // Hiển thị tổng chi tiêu
     }
+
+
     @Override
     public void onResume() {
         super.onResume();

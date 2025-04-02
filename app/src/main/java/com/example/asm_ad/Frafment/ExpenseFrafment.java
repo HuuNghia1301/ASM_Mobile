@@ -111,27 +111,64 @@ public class ExpenseFrafment extends Fragment implements ExpenseAdapter.OnExpens
             Toast.makeText(getActivity(), "Lỗi khi thêm chi tiêu!", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public void onItemClick(Expense expense) {
+        // Hiển thị thông tin cần chỉnh sửa
         etAmount.setText(String.valueOf(expense.getAmount()));
         etCategory.setText(expense.getCategory());
+        etDate.setText(expense.getDate());
+
+        // Lưu category cũ để cập nhật
+        etCategory.setTag(expense.getCategory());
+
+        // Đổi nút thành "Cập nhật"
+        btnAddExpense.setText("Cập nhật");
+        btnAddExpense.setOnClickListener(v -> {
+            updateExpense(expense);
+
+        });
+    }
+
+    // Hàm cập nhật chi tiêu
+    private void updateExpense(Expense oldExpense) {
+        String amountStr = etAmount.getText().toString().trim();
         String category = etCategory.getText().toString().trim();
-        if (dbHelper.deleteExpenseByCategory(category,userId)) {
-            showExpense();
-            Toast.makeText(getActivity(), "Xóa thành công", Toast.LENGTH_SHORT).show();
+        String date = etDate.getText().toString().trim();
+
+        if (amountStr.isEmpty() || category.isEmpty() || date.isEmpty()) {
+            Toast.makeText(getActivity(), "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double amount;
+        try {
+            amount = Double.parseDouble(amountStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getActivity(), "Số tiền không hợp lệ!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Gọi hàm cập nhật trong database
+        boolean success = dbHelper.updateExpense(userId, oldExpense.getCategory(), amount, category, date);
+        if (success) {
+            Toast.makeText(getActivity(), "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
             etAmount.setText("");
             etCategory.setText("");
             etDate.setText("");
+            btnAddExpense.setText("Thêm chi tiêu");
+            // Khôi phục sự kiện thêm mới
+            btnAddExpense.setOnClickListener(v -> addExpense());
+            showExpense();
             setBudgetStatus();
-        }
-        else {
-            Toast.makeText(getActivity(), "Lỗi Xóa chi tiêu", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), "Lỗi khi cập nhật chi tiêu!", Toast.LENGTH_SHORT).show();
         }
     }
     public void setBudgetStatus() {
         double budget = dbHelper.getUserBudget(userId); // Lấy tổng số tiền budget
         expense = dbHelper.getUseExpense(userId); // Lấy tổng số tiền chi tiêu
-        Total = budget- expense;
+        Total = budget - expense;
         this.expense = expense;
         this.Total = Total;
         String budgetText = String.valueOf(Total); // Chuyển từ double sang String
@@ -140,6 +177,14 @@ public class ExpenseFrafment extends Fragment implements ExpenseAdapter.OnExpens
         editor.putFloat("remainingBudget", (float) Total);
         editor.apply();
     }
-
-
+    @Override
+    public void onDeleteClick(Expense expense) {
+        if (dbHelper.deleteExpenseByCategory(expense.getCategory(), userId)) {
+            showExpense(); // Cập nhật danh sách
+            setBudgetStatus(); // Cập nhật ngân sách
+            Toast.makeText(getActivity(), "Xóa thành công!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), "Lỗi khi xóa chi tiêu!", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

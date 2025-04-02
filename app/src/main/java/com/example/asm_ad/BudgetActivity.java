@@ -1,6 +1,7 @@
 package com.example.asm_ad;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,9 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.asm_ad.Model.Budget;
 import com.example.asm_ad.Database.DataBaseUserHelper;
-
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+
+
 
 import com.example.asm_ad.Adapter.BudgetAdapter;
 
@@ -28,6 +39,9 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
     private BudgetAdapter budgetAdapter;
     private List<Budget> budgetList;
     private DataBaseUserHelper dbHelper;
+    private EditText edtBudgetDate;
+    // Khởi tạo đối tượng SimpleDateFormat với định dạng bạn mong muốn
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -48,7 +62,11 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         dbHelper = new DataBaseUserHelper(this);
         // Khởi tạo danh sách ngân sách
         budgetList = new ArrayList<>();
-        budgetAdapter = new BudgetAdapter(budgetList, this); // Truyền `this` để lắng nghe sự kiện click
+        budgetAdapter = new BudgetAdapter(budgetList, this);
+        edtBudgetDate = findViewById(R.id.edtBudgetDate);
+
+        edtBudgetDate.setOnClickListener(v -> showDatePicker());
+// Truyền `this` để lắng nghe sự kiện click
         showViewBudget();
 
         // Thiết lập RecyclerView
@@ -73,7 +91,28 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
         edtBudgetCategory.setTag(budget.getCategory()); // Lưu danh mục ban đầu để kiểm tra khi update
         edtBudgetAmount.setText(String.valueOf(budget.getAmount()));
     }
+    private void showDatePicker() {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                (view, selectedYear, selectedMonth, dayOfMonth) -> {
+                    // Định dạng thành "yyyy-MM"
+                    String selectedDate = String.format(Locale.getDefault(), "%d-%02d", selectedYear, selectedMonth + 1);
+                    edtBudgetDate.setText(selectedDate);
+                }, year, month, 1); // Chỉ lấy tháng, ngày mặc định là 1
+
+        datePickerDialog.show();
+    }
+
     public void saveBudget() {
+        String selectedDate = edtBudgetDate.getText().toString().trim();
+        if (selectedDate.isEmpty()) {
+            Toast.makeText(this, "Vui lòng chọn tháng!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
         String category = edtBudgetCategory.getText().toString().trim();
@@ -85,11 +124,12 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
             Toast.makeText(this, "Số tiền không hợp lệ!", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(dbHelper.isBudgetCategoryExists(category, userId)){
-            Toast.makeText(this, "Danh mục ngân sách đã tồn tại!", Toast.LENGTH_SHORT).show();
+        if (dbHelper.isBudgetCategoryExists(category, userId,  selectedDate)) {
+            Toast.makeText(this, "Danh mục ngân sách đã tồn tại trong tháng này!", Toast.LENGTH_SHORT).show();
             return;
         }
-        long insertedId = dbHelper.addBudget(amount, category, userId);
+
+        long insertedId = dbHelper.addBudget(amount, category, userId, selectedDate);
         if (insertedId != -1) {
             Toast.makeText(this, "Ngân sách đã được lưu!", Toast.LENGTH_SHORT).show();
             showViewBudget();
@@ -97,6 +137,7 @@ public class BudgetActivity extends AppCompatActivity implements BudgetAdapter.O
             Toast.makeText(this, "Lỗi khi lưu ngân sách!", Toast.LENGTH_SHORT).show();
         }
     }
+
     public void backToHome() {
         Intent intent = new Intent(BudgetActivity.this, Home.class);
         startActivity(intent);
