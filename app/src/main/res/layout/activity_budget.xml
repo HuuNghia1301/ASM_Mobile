@@ -122,6 +122,22 @@
                 android:layout_height="367dp"
                 android:layout_marginTop="8dp"
                 android:nestedScrollingEnabled="false" />
+
+            <Button
+                android:id="@+id/btnSelectMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn tháng"
+                />
+            <EditText
+                android:id="@+id/edtBudgetDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Chọn tháng"
+                android:focusable="false"
+                android:clickable="true"/>
+
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -184,7 +184,7 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
-    public boolean isBudgetCategoryExists(String category, int userId) {
+    public boolean isBudgetCategoryExists(String category, int userId, String selectedDate) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(
                 "SELECT 1 FROM " + TABLE_BUDGET + " WHERE " + COLUMN_BUDGET_CATEGORY + " = ? AND " + COLUMN_ID + " = ?",
@@ -259,7 +259,8 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         try {
             String query = "SELECT SUM(" + COLUMN_BUDGET_AMOUNT + ") " +
                     "FROM " + TABLE_BUDGET +
-                    " WHERE " + COLUMN_ID + " = ?"; // COLUMN_ID là khóa ngoại tham chiếu userId
+                    " WHERE " + COLUMN_ID + " = ? " +
+                    " AND " + COLUMN_BUDGET_DATE + " = strftime('%Y-%m', 'now')"; // COLUMN_ID là khóa ngoại tham chiếu userId
 
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
@@ -277,13 +278,44 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
 
         return budgetAmount;
     }
+    public double getUserBudgetLastMonth(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double budgetAmount = 0.0;
+
+        try {
+            String query = "SELECT SUM(" + COLUMN_BUDGET_AMOUNT + ") " +
+                    "FROM " + TABLE_BUDGET +
+                    " WHERE " + COLUMN_ID + " = ? " +
+                    " AND " + COLUMN_BUDGET_DATE + " = strftime('%Y-%m', 'now', '-1 month')";
+
+
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst() && !cursor.isNull(0)) {
+                budgetAmount = cursor.getDouble(0);
+            }
+
+            cursor.close();
+            Log.d(TAG, "getUserBudgetLastMonth: Tổng ngân sách tháng trước của User ID " + userId + " là " + budgetAmount);
+        } catch (Exception e) {
+            Log.e(TAG, "Lỗi khi lấy tổng ngân sách tháng trước", e);
+        } finally {
+            db.close();
+        }
+
+        return budgetAmount;
+    }
+
+
     public double getUseExpense(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         double expenseAmount = 0.0;
         try{
             String query = "SELECT SUM(" + COLUMN_EXPENSE_AMOUNT + ") " +
                     "FROM " + TABLE_EXPENSES +
-                    " WHERE " + COLUMN_ID + " = ?"; //
+                    " WHERE " + COLUMN_ID + " = ? " +
+                    " AND " + COLUMN_EXPENSE_DATE + " = strftime('%Y-%m', 'now')"; //
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
             if (cursor.moveToFirst() && !cursor.isNull(0)) {
                 expenseAmount = cursor.getDouble(0);
@@ -298,6 +330,35 @@ public class DataBaseUserHelper extends SQLiteOpenHelper {
         }
         return  expenseAmount ;
     }
+    public double getUserExpenseLastMonth(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double expenseAmount = 0.0;
+
+        try {
+            String query = "SELECT SUM(" + COLUMN_EXPENSE_AMOUNT + ") " +
+                    "FROM " + TABLE_EXPENSES +
+                    " WHERE " + COLUMN_ID + " = ? " +
+                    " AND " + COLUMN_EXPENSE_DATE + " = strftime('%Y-%m', 'now', '-1 month')";
+
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst() && !cursor.isNull(0)) {
+                expenseAmount = cursor.getDouble(0);
+            }
+
+            cursor.close();
+            Log.d(TAG, "getUserExpenseLastMonth: Tổng chi tiêu tháng trước của User ID " + userId + " là " + expenseAmount);
+        } catch (Exception e) {
+            Log.e(TAG, "Lỗi khi lấy tổng chi tiêu tháng trước", e);
+        } finally {
+            db.close();
+        }
+
+        return expenseAmount;
+    }
+
+
     public List<String[]> getUserBudgets(int userId) {
         List<String[]> budgetList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();

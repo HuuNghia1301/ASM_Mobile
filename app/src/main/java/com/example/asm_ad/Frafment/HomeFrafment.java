@@ -78,22 +78,25 @@ public class HomeFrafment extends Fragment {
         txtBudget.setText("Budget $ "+ budgetText); // Gán vào TextView
     }
     public void showBudget1() {
-        double expense = dbHelper.getUseExpense(userId); // Lấy tổng chi tiêu
-        double budget = dbHelper.getUserBudget(userId);  // Lấy tổng ngân sách
+        double expenseThisMonth = dbHelper.getUseExpense(userId); // Tổng chi tiêu tháng này
+        double budgetThisMonth = dbHelper.getUserBudget(userId);  // Ngân sách tháng này
 
-        double remainingAmount = budget - expense; // Tính số tiền còn lại
-
+        double expenseLastMonth = dbHelper.getUserExpenseLastMonth(userId); // Tổng chi tiêu tháng trước
+        double budgetLastMonth = dbHelper.getUserBudgetLastMonth(userId);  // Ngân sách tháng trước
+//        double remainingAmount = budgetThisMonth - expenseThisMonth; // Tính số tiền còn lại
+//        double remainingAmountLast = budgetLastMonth - expenseLastMonth ;
         // Hiển thị số tiền còn lại
-        txtExpensePercentage.setText("This money in Budget: " + remainingAmount);
-        txtExpense.setText(("$" + expense + " / $" + budget + ""));
+        txtExpensePercentage.setText("Ngân sách tháng này: " + budgetThisMonth + " | Chi tiêu: " + expenseThisMonth);
+        txtExpense.setText("Ngân sách tháng trước: " + budgetLastMonth + " | Chi tiêu: " + expenseLastMonth);
+
 
         // Cập nhật progressBar1 (Thể hiện số tiền còn lại)
-        progressBar1.setMax((int) budget);  // Ngân sách là giá trị tối đa
-        progressBar1.setProgress((int) remainingAmount); // Hiển thị số tiền còn lại
+        progressBar1.setMax((int) budgetThisMonth);  // Ngân sách là giá trị tối đa
+        progressBar1.setProgress((int) expenseThisMonth); // Hiển thị tổng chi tiêu
 
         // Cập nhật progressBar2 (Thể hiện số tiền đã chi tiêu)
-        progressBar2.setMax((int) budget);  // Cần đặt max bằng budget
-        progressBar2.setProgress((int) expense); // Hiển thị số tiền đã tiêu
+        progressBar2.setMax((int) budgetLastMonth);  // Ngân sách là giá trị tối đa
+        progressBar2.setProgress((int) expenseLastMonth); // Hiển thị tổng chi tiêu
     }
 
 
