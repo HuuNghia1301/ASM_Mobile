@@ -57,6 +57,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
                 listener.onDeleteClick(expense); // Gửi expense để xóa
             }
         });
+
     }
 
 

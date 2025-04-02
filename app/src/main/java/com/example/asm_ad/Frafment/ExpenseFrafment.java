@@ -126,6 +126,7 @@ public class ExpenseFrafment extends Fragment implements ExpenseAdapter.OnExpens
         btnAddExpense.setText("Cập nhật");
         btnAddExpense.setOnClickListener(v -> {
             updateExpense(expense);
+
         });
     }
 
@@ -156,10 +157,8 @@ public class ExpenseFrafment extends Fragment implements ExpenseAdapter.OnExpens
             etCategory.setText("");
             etDate.setText("");
             btnAddExpense.setText("Thêm chi tiêu");
-
             // Khôi phục sự kiện thêm mới
             btnAddExpense.setOnClickListener(v -> addExpense());
-
             showExpense();
             setBudgetStatus();
         } else {
@@ -178,22 +177,6 @@ public class ExpenseFrafment extends Fragment implements ExpenseAdapter.OnExpens
         editor.putFloat("remainingBudget", (float) Total);
         editor.apply();
     }
-
-//    @Override
-//    public void onItemClick(Expense expense) {
-//        // Hiển thị thông tin cần chỉnh sửa
-//        etAmount.setText(String.valueOf(expense.getAmount()));
-//        etCategory.setText(expense.getCategory());
-//        etDate.setText(expense.getDate());
-//
-//        // Gán category cũ vào Tag để cập nhật
-//        etCategory.setTag(expense.getCategory());
-//
-//        // Đổi nút thành "Cập nhật" và gọi updateExpense()
-//        btnAddExpense.setText("Cập nhật");
-//        btnAddExpense.setOnClickListener(v -> updateExpense());
-//    }
-
     @Override
     public void onDeleteClick(Expense expense) {
         if (dbHelper.deleteExpenseByCategory(expense.getCategory(), userId)) {

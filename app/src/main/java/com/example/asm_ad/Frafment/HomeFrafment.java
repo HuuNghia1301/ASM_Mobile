@@ -31,8 +31,8 @@ public class HomeFrafment extends Fragment {
     private TextView txtBudget;
 
     private int userId;
-    private ProgressBar progressBar;
-    private TextView txtExpensePercentage;
+    private ProgressBar progressBar1,progressBar2;
+    private TextView txtExpensePercentage ,txtExpense;
 
 
     @SuppressLint("MissingInflatedId")
@@ -43,10 +43,11 @@ public class HomeFrafment extends Fragment {
 
         user = view.findViewById(R.id.user);
         txtBudget = view.findViewById(R.id.txtBudget); // Cần khai báo trong XML
-        progressBar = view.findViewById(R.id.thismothBudget);
+        progressBar1 = view.findViewById(R.id.Budget);
         txtExpensePercentage = view.findViewById(R.id.txtExpensePercentage);
         btnaddBudget = view.findViewById(R.id.addBudget);
-
+        progressBar2 = view.findViewById(R.id.Expense);
+        txtExpense = view.findViewById(R.id.txtExpense);
         // Khởi tạo database helper
 
         dbHelper = new DataBaseUserHelper(requireContext());
@@ -77,14 +78,25 @@ public class HomeFrafment extends Fragment {
         txtBudget.setText("Budget $ "+ budgetText); // Gán vào TextView
     }
     public void showBudget1() {
-        double expense = dbHelper.getUseExpense(userId);
-        double budget = dbHelper.getUserBudget(userId);
+        double expense = dbHelper.getUseExpense(userId); // Lấy tổng chi tiêu
+        double budget = dbHelper.getUserBudget(userId);  // Lấy tổng ngân sách
 
-        int percent = (budget > 0) ? (int) ((expense / budget) * 100) : 0;
+        double remainingAmount = budget - expense; // Tính số tiền còn lại
 
-        txtExpensePercentage.setText("Expense this month: " + percent + "%");
-        progressBar.setProgress(percent);
+        // Hiển thị số tiền còn lại
+        txtExpensePercentage.setText("This money in Budget: " + remainingAmount);
+        txtExpense.setText(("$" + expense + " / $" + budget + ""));
+
+        // Cập nhật progressBar1 (Thể hiện số tiền còn lại)
+        progressBar1.setMax((int) budget);  // Ngân sách là giá trị tối đa
+        progressBar1.setProgress((int) remainingAmount); // Hiển thị số tiền còn lại
+
+        // Cập nhật progressBar2 (Thể hiện số tiền đã chi tiêu)
+        progressBar2.setMax((int) budget);  // Cần đặt max bằng budget
+        progressBar2.setProgress((int) expense); // Hiển thị số tiền đã tiêu
     }
+
+
     @Override
     public void onResume() {
         super.onResume();

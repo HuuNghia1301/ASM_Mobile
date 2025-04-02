@@ -62,7 +62,7 @@
                 android:gravity="center">
 
                 <ProgressBar
-                    android:id="@+id/thismothBudget"
+                    android:id="@+id/Budget"
                     style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                     android:layout_width="150dp"
                     android:layout_height="80dp"
@@ -92,7 +92,7 @@
                 android:gravity="center">
 
                 <ProgressBar
-                    android:id="@+id/thismothBudget2"
+                    android:id="@+id/Expense"
                     style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                     android:layout_width="150dp"
                     android:layout_height="80dp"
@@ -103,7 +103,7 @@
                     android:scaleY="5" />
 
                 <TextView
-                    android:id="@+id/txtExpensePercentage3"
+                    android:id="@+id/txtExpense"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"

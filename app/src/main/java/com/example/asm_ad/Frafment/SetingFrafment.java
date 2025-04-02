@@ -17,6 +17,7 @@ import com.example.asm_ad.R;
 
 public class SetingFrafment extends Fragment {
     private Button btnLogout;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -40,6 +41,8 @@ public class SetingFrafment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", getContext().MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
-        editor.apply(); // Dùng apply() thay vì commit() để tránh lag UI
+        editor.apply(); // Dùng apply()  để tránh lag UI
+
+
     }
 }

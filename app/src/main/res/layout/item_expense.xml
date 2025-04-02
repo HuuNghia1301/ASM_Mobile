@@ -52,10 +52,4 @@
         android:layout_height="48dp"
         android:text="Delete" />
 
-    <Button
-        android:id="@+id/btnUpdateExpense"
-        android:layout_width="109dp"
-        android:layout_height="wrap_content"
-        android:text="Update" />
-
 </LinearLayout>
